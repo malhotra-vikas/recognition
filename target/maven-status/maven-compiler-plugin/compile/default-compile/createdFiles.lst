@@ -1,5 +1,6 @@
 com/treenity/image/recognition/s3/SetAcl.class
 com/treenity/image/recognition/s3/GeneratePresignedUrlUploadImage.class
+com/treenity/image/recognition/utils/JsonFilter.class
 com/treenity/image/recognition/utils/RekognitionHandler.class
 com/treenity/image/recognition/s3/KMSEncryptionExample.class
 com/treenity/image/recognition/s3/DeleteObjects.class
@@ -70,5 +71,4 @@ com/treenity/image/recognition/s3/transfermanager/UploadADirectory.class
 com/treenity/image/recognition/s3/DeleteWebsiteConfiguration.class
 com/treenity/image/recognition/s3/SetBucketPolicy.class
 com/treenity/image/recognition/s3/GeneratePresignedUrlAndUploadObject.class
-com/treenity/image/recognition/ReturnPojo.class
 com/treenity/image/recognition/s3/AbortMultipartUpload.class

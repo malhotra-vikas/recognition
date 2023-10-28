@@ -13,7 +13,6 @@
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/S3Cors.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/DeleteBucketPolicy.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/GetBucketPolicy.java
-/Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/ReturnPojo.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/LifecycleConfiguration.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/utils/MemoryLog4jAppender.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/ParseUri.java
@@ -52,6 +51,7 @@
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/ManagingObjectTags.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/GetObjectTags.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/S3BucketDeletion.java
+/Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/utils/JsonFilter.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/PutObjectMetadata.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/DeleteObjects.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/PutBucketLogging.java
