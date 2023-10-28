@@ -3,7 +3,7 @@ package com.treenity.image.recognition.utils;
 import java.util.Iterator;
 import java.util.List;
 
-import com.impgo.demoappsp.S3.ListObjects;
+import com.treenity.image.recognition.s3.ListObjects;
 
 import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.core.sync.RequestBody;

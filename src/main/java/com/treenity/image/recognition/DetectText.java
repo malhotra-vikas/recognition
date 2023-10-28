@@ -15,7 +15,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.treenity.image.recognition.utils.ParsedText;
+import com.treenity.image.recognition.utils.*;
 
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.DetectTextRequest;

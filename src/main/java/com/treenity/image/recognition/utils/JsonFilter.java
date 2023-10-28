@@ -1,0 +1,55 @@
+package com.treenity.image.recognition.utils;
+
+import java.math.BigDecimal;
+
+import org.json.*;
+
+
+
+
+public class JsonFilter {
+	
+
+	public JsonFilter() {
+		super();
+	}
+	
+
+
+	public String filterJsonByConfidence(int confidence, String jsonData) {
+		
+		JSONArray jsonArray = new JSONArray(jsonData);
+		
+		// Create a new JSONArray to hold the filtered entries
+		JSONArray filteredArray = new JSONArray();
+
+        // Iterate through the original array
+        for (int i = 0; i < jsonArray.length(); i++) {
+        	JSONObject entry = (JSONObject) jsonArray.get(i);
+        	
+        	System.out.println("JSON ARRAY Entry : Before Filtering : + " + entry);
+        	
+        	// Check the Type
+        	String type = (String) entry.get("type");
+        	
+            // Check the confidence value
+        	BigDecimal bigConfidence = (BigDecimal) entry.get("confidence");
+            
+            double entryConfidence = bigConfidence.doubleValue();
+            
+            if (type.equals("WORD") && entryConfidence > confidence) {
+                // Add entry to the filtered array if confidence is greater than 90%
+                filteredArray.put(entry);
+            }
+        }
+        
+    	System.out.println("FILTERED JSON ARRAY  : After Filtering : + " + filteredArray.toString(2));
+
+        return filteredArray.toString(2);
+		
+
+	}
+	
+	
+
+}
