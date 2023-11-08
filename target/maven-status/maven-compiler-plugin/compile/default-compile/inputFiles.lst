@@ -12,6 +12,7 @@
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/CopyObjectStorage.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/S3Cors.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/DeleteBucketPolicy.java
+/Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/ddb/ScanImageMetadata.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/GetBucketPolicy.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/LifecycleConfiguration.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/utils/MemoryLog4jAppender.java
@@ -28,6 +29,7 @@
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/GetObjectData.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/ListObjectsPaginated.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/CopyObject.java
+/Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/ddb/package-info.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/GetAcl.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/AbortMultipartUpload.java
 /Users/vikasmalhotra/Builderspace/recognition/src/main/java/com/treenity/image/recognition/s3/SetBucketPolicy.java

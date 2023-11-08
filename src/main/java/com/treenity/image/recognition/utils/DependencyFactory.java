@@ -14,7 +14,7 @@ import software.amazon.awssdk.transfer.s3.S3TransferManager;
 
 
 /**
- * The module containing all dependencies required by the {@link AWSRekonigitionMaster}.
+ * The module containing all dependencies required by the {@link RekonigitionMetadataBuilder}.
  */
 public class DependencyFactory {
 
@@ -69,8 +69,8 @@ public class DependencyFactory {
     private static String ddbImageURL_key = "imageurl";
     private static String detectedText_key = "detectedtext";
     private static String detectedLabel_key = "detectedlabel";
-    private static String highConfidemnceLabel_key = "hiconfidence-image-label";
-    private static String highConfidemnceText_key = "hiconfidence-image-text";
+    private static String highConfidemnceLabel_key = "hiconfidenceImageLabel";
+    private static String highConfidemnceText_key = "hiconfidenceImageText";
 
 
     private static String s3Bucket_default = "mediastore";

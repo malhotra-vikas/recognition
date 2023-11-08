@@ -66,6 +66,7 @@ com/treenity/image/recognition/s3/async/S3AsyncStreamOps.class
 com/treenity/image/recognition/s3/S3BucketOps.class
 com/treenity/image/recognition/s3/CreateAccessPoint.class
 com/treenity/image/recognition/s3/async/GetObjectDataAsync.class
+com/treenity/image/ddb/ScanImageMetadata.class
 com/treenity/image/recognition/DetectLabels$1.class
 com/treenity/image/recognition/s3/transfermanager/UploadADirectory.class
 com/treenity/image/recognition/s3/DeleteWebsiteConfiguration.class
