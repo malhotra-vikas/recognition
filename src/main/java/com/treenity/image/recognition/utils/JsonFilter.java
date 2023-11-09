@@ -1,6 +1,8 @@
 package com.treenity.image.recognition.utils;
 
 import java.math.BigDecimal;
+
+import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -29,14 +31,23 @@ public class JsonFilter {
 
 			// Check the Type
 			String type = (String) entry.get("type");
+			
+			// Check if detected text is a number
+			String detectedText = (String) entry.get("detectedText");
+			
+			boolean detectedTextIsNumber = false;
+			if (NumberUtillity.isNumeric(detectedText)) {
+				detectedTextIsNumber = true;
+			}
+
 
 			// Check the confidence value
 			BigDecimal bigConfidence = (BigDecimal) entry.get("confidence");
 
 			double entryConfidence = bigConfidence.doubleValue();
 
-			if (type.equals("WORD") && entryConfidence > confidence) {
-				// Add entry to the filtered array if confidence is greater than 90%
+			if (detectedTextIsNumber && entryConfidence > confidence && type.equals("WORD")) {
+				// Add entry to the filtered array if confidence is greater than 90% and the detected Text is a number
 				filteredArray.put(entry);
 			}
 		}

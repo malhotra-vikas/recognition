@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.treenity.image.recognition.utils.DDBHandler;
 import com.treenity.image.recognition.utils.DependencyFactory;
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -43,6 +44,18 @@ public class DDBCrud {
 	    }
 	}
 	
+	public void persistNoConfidenceImage(String keyToUpdate) {
+        DynamoDbClient dynamodbClient = DependencyFactory.ddbClient();
+        String ddbTableName = "noConfidenceImages.1";
+
+        HashMap<String, String> attributesHashMap = new HashMap<>();
+        attributesHashMap.put("imageId", keyToUpdate);
+
+        DDBHandler ddbHandler = new DDBHandler();
+        ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);
+	}
+	
+	
 	public Map<String, AttributeValue> readItem(String tableName, Map<String, AttributeValue> keyToGet, String columnsToRead) {
         DynamoDbClient dynamodbClient = DependencyFactory.ddbClient(); 
         
@@ -62,7 +75,7 @@ public class DDBCrud {
 	    try {
 	        returnedItem = dynamodbClient.getItem(request).item();
 	        if (returnedItem != null) {
-	            System.out.println("Item read: " + returnedItem);
+	            System.out.println("Item found");
 	        } else {
 	            System.out.println("Item not found");
 	        }
@@ -156,21 +169,21 @@ public class DDBCrud {
                 // Process each item
                 for (Map<String, AttributeValue> item : items) {
                     // Here you can handle each item as you need
-                    System.out.println(item);
+                    //System.out.println(item);
                     count ++;
                     attrValue = item.get(keyColumn);
                     if (attrValue != null && attrValue.s() != null) {
                         String imageId = attrValue.s();
                         scannedKeys.add(imageId);
-                        System.out.println(imageId);
+                        //System.out.println(imageId);
 
                     }
                 }
 
                 lastEvaluatedKey = scanResponse.lastEvaluatedKey();
-                System.out.println(count);
-                System.out.println(lastEvaluatedKey);
-                System.out.println(scannedKeys.size());
+                //System.out.println(count);
+                //System.out.println(lastEvaluatedKey);
+                System.out.println("scannedKeys.size  :" + scannedKeys.size());
 
             } catch (DynamoDbException e) {
                 System.err.println(e.getMessage());

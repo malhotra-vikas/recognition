@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang3.math.NumberUtils;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import java.util.Map;
 import com.treenity.image.ddb.DDBCrud;
 import com.treenity.image.recognition.utils.DependencyFactory;
 import com.treenity.image.recognition.utils.ImageKeyUtils;
+import com.treenity.image.recognition.utils.NumberUtillity;
 
 public class DynamoDBACtionTest {
 
@@ -47,7 +50,7 @@ public class DynamoDBACtionTest {
     	// Ideally this comes from a stream or a queue that has all Image Keys
     	
     	scannedKeys = crud.fetchAllKeys(tableName, keyColumn);
-		System.out.print("scannedKeys size : " + scannedKeys.size());
+		System.out.println("scannedKeys size : " + scannedKeys.size());
 
     	String keyToRead;
     	ArrayList<String> detectedTextList = null;
@@ -57,7 +60,7 @@ public class DynamoDBACtionTest {
     		keyToRead = scannedKeys.get(i);
     		detectedTextList = new ArrayList<String>();
     		
-    		System.out.print("Key To read : " + keyToRead);
+    		System.out.println("Key To read : " + keyToRead);
     		    		
 //    		hiconfidenceImageText = imageKeyUtils.readHiconfidenceImageText(keyToRead);
     		imageKeyUtils = testRead(keyToRead);
@@ -73,22 +76,32 @@ public class DynamoDBACtionTest {
                 		imageKeyUtils.getHighConfidenceDetectedTextList(),
                     new TypeReference<List<Map<String, Object>>>() {}
                 );
+                
+                // Case where there was no high confidence recognition for a number
+                if (hiconfidenceImageTextList.size() == 0) {
+                	crud.persistNoConfidenceImage(keyToRead);
+                }
 
                 String detectedText;
                 // Iterate over the list and read the desired values
                 for (Map<String, Object> textEntry : hiconfidenceImageTextList) {
                     detectedText = (String) textEntry.get("detectedText");
-                	detectedTextList.add(detectedText);
+                    System.out.println("detected text :" + detectedText + ":");
+
+                    if (NumberUtillity.isNumeric(detectedText)) {
+                    	detectedTextList.add(detectedText);
+                        System.out.println("Number only detected text : " + detectedText);
+
+                    }
                 }
                 imageKeyUtils.setDetectedTextList(detectedTextList);
                 
-                System.out.println(imageKeyUtils.getImageId());
-                System.out.println(imageKeyUtils.getImageURL());
-                System.out.println(imageKeyUtils.getDetectedTextList().size());
+                //System.out.println(imageKeyUtils.getImageId());
+                //System.out.println(imageKeyUtils.getImageURL());
+                System.out.println("Number only detected text Size : " + imageKeyUtils.getDetectedTextList().size());
                 
                 imageKeyUtils.transformAndPersistToDDB(imageKeyUtils);
                 
-                break;
 
             } catch (IOException e) {
                 e.printStackTrace();

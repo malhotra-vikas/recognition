@@ -3,11 +3,15 @@ package com.treenity.image.recognition.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
+
 
 import com.treenity.image.ddb.DDBCrud;
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
+
 
 public class ImageKeyUtils {
 	String imageId;
@@ -59,37 +63,77 @@ public class ImageKeyUtils {
 		Map<String, AttributeValue> fetchedEntry = null;
 		
 		int size = detectedTextList.size();
-        System.out.println(size);
+        //System.out.println(size);
 
 		for (int i=0; i<size; i++) {
 			fetchedEntry = null;
 			
 			detectedTextToProcess = detectedTextList.get(i);
-			System.out.println(detectedTextToProcess);
+			System.out.println("detectedTextToProcess : " + detectedTextToProcess);
 
 			
 			// Fetch an existing Entry for the detectedText
 			fetchedEntry = ddbHandler.fetchDDBEntry(detectedTextToProcess);
 			
-			System.out.println(fetchedEntry);
-			System.out.println(fetchedEntry.size());
+			System.out.println("Number of Existing entries for selected detectedTextToProcess :"+ fetchedEntry.size());
+			//System.out.println(fetchedEntry.size());
 
-			// If existing entry exist
-			
+            String ddbTableName = "recognizedText.1";
+            String pkKeyName = "detectedText";
+            String listAttributeKeyName = "imageArtifacts";
+            
 			// If existing entry does not exist 
 			if (fetchedEntry == null || fetchedEntry.size() == 0)  {
 				// Exiting entry for this detected text does not exists./ Create a new one
-	            String ddbTableName = "recognizedText.1";
-	            HashMap<String, String> attributesHashMap = new HashMap<>();
-	            attributesHashMap.put("detectedText", detectedTextToProcess);
 
-	            //attributesHashMap.put(DependencyFactory.getDetectedLabel_key(), detectedLabelsToProcess);
-	            attributesHashMap.put("imageArtifacts", imageId + " : " + imageUrl);
-	            //attributesHashMap.put(DependencyFactory.getHighConfidemnceLabel_key(), highConfidenceLabelsToProcess);
+	            
+	            Map<String, AttributeValue> itemKey = new HashMap<>();
+	            itemKey.put(pkKeyName, AttributeValue.builder().s(detectedTextToProcess).build());
 
-	            ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);				
+	            AttributeValue listAttributeValue = AttributeValue.builder()
+	                    .l(Arrays.asList(AttributeValue.builder().s(imageId).build(),
+	                                     AttributeValue.builder().s(imageUrl).build()))
+	                    .build();
+	            
+	            Map<String, AttributeValue> attributeValues = new HashMap<>();
+	            attributeValues.put(":val", listAttributeValue);
+
+	            UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
+	                    .tableName(ddbTableName)
+	                    .key(itemKey)
+	                    .updateExpression("SET " + listAttributeKeyName + " = :val")
+	                    .expressionAttributeValues(attributeValues)
+	                    .build();
+
+	            dynamodbClient.updateItem(updateItemRequest);
+	            
 			} else {
 				// Exiting entry for this detected text exists./ Update the same
+				System.out.println("Existing entry, lets add to it");
+	            Map<String, AttributeValue> itemKey = new HashMap<>();
+	            itemKey.put(pkKeyName, AttributeValue.builder().s(detectedTextToProcess).build());
+	            
+	         // New values to append
+	            AttributeValue newValues = AttributeValue.builder()
+	                    .l(Arrays.asList(AttributeValue.builder().s(imageId).build(),
+                                		AttributeValue.builder().s(imageUrl).build()))
+	                    .build();
+	            
+	            // Setting up the update expression to append newValues to the list
+	            String updateExpression = "SET " + listAttributeKeyName + " = list_append(" + listAttributeKeyName + ", :val)";
+
+	            Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
+	            expressionAttributeValues.put(":val", newValues);
+
+	            UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
+	                    .tableName(ddbTableName)
+	                    .key(itemKey)
+	                    .updateExpression(updateExpression)
+	                    .expressionAttributeValues(expressionAttributeValues)
+	                    .build();
+
+	            dynamodbClient.updateItem(updateItemRequest);
+
 
 			}
 		}

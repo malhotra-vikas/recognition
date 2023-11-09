@@ -61,6 +61,12 @@
 			<version>2.20.93</version>
 		</dependency>
 
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.12.0</version> <!-- Use the latest version available -->
+</dependency>
+
 		<!-- https://mvnrepository.com/artifact/software.amazon.awscdk/lambda -->
 		<dependency>
 			<groupId>software.amazon.awscdk</groupId>
