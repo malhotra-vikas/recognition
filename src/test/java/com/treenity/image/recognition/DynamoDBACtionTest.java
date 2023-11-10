@@ -79,6 +79,7 @@ public class DynamoDBACtionTest {
                 
                 // Case where there was no high confidence recognition for a number
                 if (hiconfidenceImageTextList.size() == 0) {
+                    System.out.println("Saving No Text Detected File");
                 	crud.persistNoConfidenceImage(keyToRead);
                 }
 

@@ -12,23 +12,17 @@ CSV_FILE="/Users/vikasmalhotra/Downloads/processedImages/results.csv"
 # Base directory where subdirectories will be created
 BASE_DIRECTORY="/Users/vikasmalhotra/Downloads/processedImages"
 
-# Read the CSV file line by line
-while IFS=, read -r column1 json_column
+# Read the CSV file line by line, skipping the header
+tail -n +2 "$CSV_FILE" | while IFS=, read -r detectedText imageArtifacts
 do
-  # Remove leading and trailing quotes and replace escaped double quotes
-  json_string=$(echo "$json_column" | sed -e 's/^"//' -e 's/"$//' -e 's/\\"/"/g')
+    # Remove extra quotes from imageArtifacts and split the string into URLs
+    urls=$(echo $imageArtifacts | sed -e 's/^"//' -e 's/"$//' -e 's/, /,/g')
 
-  # Extract values from the JSON string using jq
-  # Assuming the JSON is an array of objects with key "S"
-  for row in $(echo "${json_string}" | jq -c '.[]'); do
-    key=$(echo $row | jq -r '.S')
+    # Process each URL
+    IFS=',' read -ra ADDR <<< "$urls"
+    for url in "${ADDR[@]}"; do
+        echo "Processing URL: $url for detected text: $detectedText"
+        # Add your URL processing logic here (e.g., download images)
+    done
+done
 
-    # Determine if the key is a filename or a URL
-    if [[ $key == http* ]]; then
-      echo "URL: $key"
-    else
-      echo "File: $key"
-    fi
-  done
-
-done < "$CSV_FILE"

@@ -49,7 +49,7 @@ public class DDBCrud {
         String ddbTableName = "noConfidenceImages.1";
 
         HashMap<String, String> attributesHashMap = new HashMap<>();
-        attributesHashMap.put("imageId", keyToUpdate);
+        attributesHashMap.put("imageid", keyToUpdate);
 
         DDBHandler ddbHandler = new DDBHandler();
         ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);

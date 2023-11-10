@@ -53,6 +53,7 @@ public class ImageKeyUtils {
 		HashMap<String, String> imageKeyUrlMap = new HashMap<String, String>();
 		HashMap<String, HashMap<String, String>> persistenceReadyMap = new HashMap<>();
 		DDBHandler ddbHandler = new DDBHandler();
+		DDBCrud crud = new DDBCrud();
 		
 		String imageId = imageKeyUtils.getImageId();
 		String imageUrl = imageKeyUtils.getImageURL();
@@ -86,13 +87,17 @@ public class ImageKeyUtils {
 			if (fetchedEntry == null || fetchedEntry.size() == 0)  {
 				// Exiting entry for this detected text does not exists./ Create a new one
 
-	            
+		        HashMap<String, String> attributesHashMap = new HashMap<>();
+		        attributesHashMap.put(pkKeyName, detectedTextToProcess);
+		        attributesHashMap.put("imageArtifacts", imageUrl);
+		        ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);
+
+/*	            
 	            Map<String, AttributeValue> itemKey = new HashMap<>();
 	            itemKey.put(pkKeyName, AttributeValue.builder().s(detectedTextToProcess).build());
 
 	            AttributeValue listAttributeValue = AttributeValue.builder()
-	                    .l(Arrays.asList(AttributeValue.builder().s(imageId).build(),
-	                                     AttributeValue.builder().s(imageUrl).build()))
+	                    .l(Arrays.asList(AttributeValue.builder().s(imageUrl).build()))
 	                    .build();
 	            
 	            Map<String, AttributeValue> attributeValues = new HashMap<>();
@@ -106,17 +111,37 @@ public class ImageKeyUtils {
 	                    .build();
 
 	            dynamodbClient.updateItem(updateItemRequest);
+*/	          
 	            
 			} else {
 				// Exiting entry for this detected text exists./ Update the same
 				System.out.println("Existing entry, lets add to it");
+				String existingImageUrls = null;
+		    	Map<String, AttributeValue> existingItem;
+
+		        // Construct the key with which to query
+		        HashMap<String, AttributeValue> keyToGet = new HashMap<>();
+
+		        keyToGet.put(pkKeyName, AttributeValue.builder()
+		                .s(detectedTextToProcess) // .s for string type attributes, you can use .n for number types, etc.
+		                .build());
+		        
+		        existingItem = crud.readItem(ddbTableName, keyToGet, listAttributeKeyName);
+		    	existingImageUrls = existingItem.get(listAttributeKeyName).s();
+				System.out.println("existingImageUrls - " + existingImageUrls);
+
+				
+		        HashMap<String, String> attributesHashMap = new HashMap<>();
+		        attributesHashMap.put(pkKeyName, detectedTextToProcess);
+		        attributesHashMap.put("imageArtifacts", existingImageUrls +", " + imageUrl);
+		        ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);
+/*				
 	            Map<String, AttributeValue> itemKey = new HashMap<>();
 	            itemKey.put(pkKeyName, AttributeValue.builder().s(detectedTextToProcess).build());
 	            
 	         // New values to append
 	            AttributeValue newValues = AttributeValue.builder()
-	                    .l(Arrays.asList(AttributeValue.builder().s(imageId).build(),
-                                		AttributeValue.builder().s(imageUrl).build()))
+	                    .l(Arrays.asList(AttributeValue.builder().s(imageUrl).build()))
 	                    .build();
 	            
 	            // Setting up the update expression to append newValues to the list
@@ -133,7 +158,7 @@ public class ImageKeyUtils {
 	                    .build();
 
 	            dynamodbClient.updateItem(updateItemRequest);
-
+*/
 
 			}
 		}
