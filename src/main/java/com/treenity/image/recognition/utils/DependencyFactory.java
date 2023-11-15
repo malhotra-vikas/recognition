@@ -3,6 +3,7 @@ package com.treenity.image.recognition.utils;
 
 import static software.amazon.awssdk.transfer.s3.SizeConstant.MB;
 
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.regions.Region;
@@ -13,8 +14,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 
 
+
 /**
- * The module containing all dependencies required by the {@link RekonigitionMetadataBuilder}.
+ * The module containing all dependencies required by the {@link PictureMetadataBuilder}.
  */
 public class DependencyFactory {
 
@@ -73,7 +75,7 @@ public class DependencyFactory {
     private static String highConfidemnceText_key = "hiconfidenceImageText";
 
 
-    private static String s3Bucket_default = "mediastore";
+    private static String s3Bucket_default = "mediastore.primary";
     private static String s3bucket_processed_default = "mediastore.processed";
 
     private static Region region = Region.US_EAST_2;
@@ -84,11 +86,17 @@ public class DependencyFactory {
      * @return an instance of S3Client
      */
     public static S3Client s3Client() {
+    	return S3Client.builder()
+                .region(Region.US_EAST_2)
+                .httpClientBuilder(UrlConnectionHttpClient.builder())
+                .build();
+/*    	
         return S3Client.builder()
                        .credentialsProvider(ProfileCredentialsProvider.create("default"))
                        .region(Region.US_EAST_2)
                        .httpClientBuilder(UrlConnectionHttpClient.builder())
                        .build();
+*/
     }
     
     public static S3TransferManager createDefaultTm() {
@@ -102,7 +110,6 @@ public class DependencyFactory {
         // snippet-start:[s3.tm.java2.s3clientfactory.create_custom_tm]
         S3AsyncClient s3AsyncClient =
             S3AsyncClient.crtBuilder()
-            	.credentialsProvider(ProfileCredentialsProvider.create("default"))
             	.region(Region.US_EAST_2)
                 .targetThroughputInGbps(20.0)
                 .minimumPartSizeInBytes(8 * MB)
@@ -118,18 +125,17 @@ public class DependencyFactory {
 
     public static DynamoDbClient ddbClient() {
     	return DynamoDbClient.builder()
-    			.credentialsProvider(ProfileCredentialsProvider.create("default"))
-    			.region(Region.US_EAST_2)
+                .region(Region.US_EAST_2)
                 .httpClientBuilder(UrlConnectionHttpClient.builder())
-    			.build();
+                .build();
+    
     }
     
     public static RekognitionClient getRekognitionClient() {
     	return RekognitionClient.builder()
-    			.credentialsProvider(ProfileCredentialsProvider.create("default"))
-    			.region(Region.US_EAST_2)
+                .region(Region.US_EAST_2)
     			.httpClientBuilder(UrlConnectionHttpClient.builder())
-    			.build();
+                .build();
     		}
 
 	public static final String getDdbTableName_default() {

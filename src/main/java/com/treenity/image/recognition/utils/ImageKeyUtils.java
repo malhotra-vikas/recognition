@@ -70,7 +70,7 @@ public class ImageKeyUtils {
 			fetchedEntry = null;
 			
 			detectedTextToProcess = detectedTextList.get(i);
-			System.out.println("detectedTextToProcess : " + detectedTextToProcess);
+			//System.out.println("detectedTextToProcess : " + detectedTextToProcess);
 
 			
 			// Fetch an existing Entry for the detectedText

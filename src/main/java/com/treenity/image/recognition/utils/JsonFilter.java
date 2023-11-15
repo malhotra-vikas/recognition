@@ -27,7 +27,7 @@ public class JsonFilter {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject entry = (JSONObject) jsonArray.get(i);
 
-			System.out.println("JSON ARRAY Entry : Before Filtering : + " + entry);
+			//System.out.println("JSON ARRAY Entry : Before Filtering : + " + entry);
 
 			// Check the Type
 			String type = (String) entry.get("type");
@@ -52,7 +52,7 @@ public class JsonFilter {
 			}
 		}
 
-		System.out.println("FILTERED JSON ARRAY  : After Filtering : + " + filteredArray.toString(2));
+		//System.out.println("FILTERED JSON ARRAY  : After Filtering : + " + filteredArray.toString(2));
 
 		return filteredArray.toString(2);
 

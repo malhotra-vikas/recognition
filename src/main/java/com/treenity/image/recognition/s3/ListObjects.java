@@ -15,6 +15,9 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+
+import java.util.Optional;
 import java.util.List;
 // snippet-end:[s3.java2.list_objects.import]
 
@@ -41,10 +44,16 @@ public class ListObjects {
 
             ListObjectsResponse res = s3.listObjects(listObjects);
             objects = res.contents();
+            String URL = "";
+            String key;
+            String region = "us-east-2";
+            
             for (S3Object myValue : objects) {
-                System.out.print("\n The name of the key is " + myValue.key());
-                System.out.print("\n The object is " + calKb(myValue.size()) + " KBs");
-                System.out.print("\n The owner is " + myValue.owner());
+            	key = myValue.key();
+            	URL = "https://" + "s3." + region + ".amazonaws.com/" + bucketName +"/" + key;
+
+                System.out.println("\n In LIst Objects: The name of the key is " + key);
+                System.out.println("\n In LIst Objects: The URL is " + URL);
             }
 
         } catch (S3Exception e) {
@@ -54,6 +63,28 @@ public class ListObjects {
         return objects;
     }
 
+    public Optional<S3Object> getObjectByKey(S3Client s3, String bucketName, String objectKey) {
+
+    	try {
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(objectKey)
+                    .build();
+
+            s3.getObject(getObjectRequest);
+
+            // If the object is successfully retrieved, return an Optional of it
+            return Optional.of(S3Object.builder()
+                    .key(objectKey)
+                    // Additional attributes can be set here if needed
+                    .build());
+        } catch (S3Exception e) {
+            System.err.println(e.awsErrorDetails().errorMessage());
+            // Consider a better error handling strategy for your use case
+        }
+        return Optional.empty();
+    }
+    
     //convert bytes to kbs.
     private static long calKb(Long val) {
         return val/1024;

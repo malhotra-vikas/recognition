@@ -52,16 +52,11 @@ public class RekonigitionMetadataBuilder {
         S3Object s3ObjectToProcess;
         URL urlToProcess;
         String detectedTextToProcess;
-        //String detectedLabelsToProcess;
         String highConfidenceText;
-        //String highConfidenceLabelsToProcess;
         List<ParsedText> parsedTextList;
-        //List<ParsedLabel> parsedLabelsList;
-        //ParsedLabel label;
         ParsedText text;
         
         List<ParsedText> highConfidenceParsedTextList;
-        //List<ParsedLabel> highConfidenceParsedLabelsList;
 
     	Gson gson = new GsonBuilder().create();
 
@@ -75,8 +70,8 @@ public class RekonigitionMetadataBuilder {
         	keyToProcess = s3ObjectToProcess.key();
         	urlToProcess = getObjectURl.getURL(s3Client, S3bucket, keyToProcess);
         	
-        	System.out.print("Iterating - Key - " + keyToProcess);
-        	System.out.print("Iterating - URL - " + urlToProcess);
+        	System.out.println("Iterating - Key - " + keyToProcess);
+        	System.out.println("Iterating - URL - " + urlToProcess);
 
 // Build Rekognition Client
         	RekognitionClient rekClient = DependencyFactory.getRekognitionClient();
@@ -85,32 +80,13 @@ public class RekonigitionMetadataBuilder {
 // Detect Text
 
             detectedTextToProcess = rekognitionHandler.detectText(rekClient, S3bucket, keyToProcess);
-            System.out.println("Iterating Detected Text - Text - " + detectedTextToProcess);
+            //System.out.println("Iterating Detected Text - Text - " + detectedTextToProcess);
             
             JsonFilter jsonFilter = new JsonFilter();
             int confidenceToFilter = 95;
             
             highConfidenceText = jsonFilter.filterJsonByConfidence(confidenceToFilter, detectedTextToProcess);
-            
-// Detect Labels
-
-            //detectedLabelsToProcess = rekognitionHandler.detectLabels(rekClient, S3bucket, keyToProcess);
-            //System.out.println("Iterating - Label - " + detectedLabelsToProcess);
-// Build a JSON with high confidence detection of >80%
-            //parsedLabelsList = rekognitionHandler.buildHighConfidenceLabel(detectedLabelsToProcess);
-/*
-            for (int j=0; j<parsedLabelsList.size(); j++) {
-            	
-            	label = (ParsedLabel) parsedLabelsList.get(j);
-                System.out.println("Iterating - confidence -" + label.getConfidence() +"-");
-
-                
-            	if (Double.parseDouble(label.getConfidence()) > 80) {
-            		highConfidenceParsedLabelsList.add(label);
-            	}
-            }
-            highConfidenceLabelsToProcess = gson.toJson(highConfidenceParsedLabelsList);
-*/    
+        
             
 // DDB Operations
             DynamoDbClient dynamodbClient = DependencyFactory.ddbClient();   

@@ -2,6 +2,7 @@ package com.treenity.image.recognition.utils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import com.treenity.image.recognition.s3.ListObjects;
 
@@ -31,6 +32,11 @@ public class S3Handler {
     public List<S3Object> fetchAllObjects(S3Client s3Client, String bucket) {
     	ListObjects s3Objects = new ListObjects();
     	return s3Objects.listBucketObjects(s3Client, bucket);
+    }
+    
+    public Optional<S3Object> fetchObjectByKey(S3Client s3Client, String bucket, String objectKey) {
+    	ListObjects s3Objects = new ListObjects();
+    	return s3Objects.getObjectByKey(s3Client, bucket, objectKey);
     }
     
 	public void sendRequest() {
