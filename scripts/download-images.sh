@@ -51,12 +51,13 @@ echo "Both queues have no messages in flight."
 # Scan DynamoDB table and get items
 ITEMS=$(aws dynamodb scan --table-name "$TABLE_NAME" --region "$REGION" --output json)
 
-# Loop through each item
+# Created Directories for Detected Text
 echo "$ITEMS" | jq -c '.Items[]' | while read -r ITEM; do
     # Extract detectedText and imageArtifacts
     DETECTED_TEXT=$(echo "$ITEM" | jq -r '.detectedText.S')
     IMAGE_ARTIFACTS=$(echo "$ITEM" | jq -r '.imageArtifacts.S')
-    echo $DETECTED_TEXT
+    echo "Detected Text $DETECTED_TEXT"
+    echo "Image Artifacts $IMAGE_ARTIFACTS"
 
     # Create a directory for detectedText
     DIR_PATH="$LOCAL_DIRECTORY/$DETECTED_TEXT"
@@ -71,8 +72,10 @@ echo "$ITEMS" | jq -c '.Items[]' | while read -r ITEM; do
         echo "Downloading S3 File $URL to $DIR_PATH/$FILE_NAME"
 
         S3URL="s3://$S3_BUCKET/$FILE_NAME"
-        echo "Running command: s3 cp $S3URL"
 
         aws s3 cp "$S3URL" "$DIR_PATH/$FILE_NAME"
     done
+
 done
+
+
