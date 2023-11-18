@@ -9,7 +9,7 @@ public class RekognitionMetadataProcessor {
     	String ddbTableName = DependencyFactory.getDdbTableName_default()+"."+DependencyFactory.getCompanyID();
         
         ScanImageMetadata scanImageMetadata = new ScanImageMetadata();
-        scanImageMetadata.scanTable(ddbTableName);
+        //scanImageMetadata.scanTable(ddbTableName);
         
         
     	

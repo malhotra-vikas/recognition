@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>fotos recognition</title>
+    <script>
+        // Function to handle the form submission
+        function submitForm() {
+            // Prevent the default form behavior
+            event.preventDefault();
+
+            // Get the value from the text input
+            var userInput = document.getElementById('textInput').value;
+
+            // Lambda API Endpoint URL
+            var apiEndpoint = 'YOUR_LAMBDA_API_ENDPOINT_URL';
+
+            // Create the request
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', apiEndpoint, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            // Define what happens on successful data submission
+            xhr.onload = function () {
+                // Process the response here
+                console.log(xhr.responseText);
+                alert('Response received: ' + xhr.responseText);
+            };
+
+            // Define what happens in case of an error
+            xhr.onerror = function () {
+                console.log('Request error...');
+            };
+
+            // Setup and send the request
+            var data = JSON.stringify({ "userInput": userInput });
+            xhr.send(data);
+        }
+    </script>
+</head>
+<body>
+    <h1>Submit to Lambda API</h1>
+    <form onsubmit="submitForm()">
+        <input type="text" id="textInput" placeholder="Enter text">
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

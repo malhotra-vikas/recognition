@@ -11,6 +11,9 @@ import com.treenity.image.ddb.DDBCrud;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SqsException;
 
 
 public class ImageKeyUtils {
@@ -76,6 +79,7 @@ public class ImageKeyUtils {
 			// Fetch an existing Entry for the detectedText
 			fetchedEntry = ddbHandler.fetchDDBEntry(detectedTextToProcess);
 			
+			
 			System.out.println("Number of Existing entries for selected detectedTextToProcess :"+ fetchedEntry.size());
 			//System.out.println(fetchedEntry.size());
 
@@ -91,28 +95,6 @@ public class ImageKeyUtils {
 		        attributesHashMap.put(pkKeyName, detectedTextToProcess);
 		        attributesHashMap.put("imageArtifacts", imageUrl);
 		        ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);
-
-/*	            
-	            Map<String, AttributeValue> itemKey = new HashMap<>();
-	            itemKey.put(pkKeyName, AttributeValue.builder().s(detectedTextToProcess).build());
-
-	            AttributeValue listAttributeValue = AttributeValue.builder()
-	                    .l(Arrays.asList(AttributeValue.builder().s(imageUrl).build()))
-	                    .build();
-	            
-	            Map<String, AttributeValue> attributeValues = new HashMap<>();
-	            attributeValues.put(":val", listAttributeValue);
-
-	            UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
-	                    .tableName(ddbTableName)
-	                    .key(itemKey)
-	                    .updateExpression("SET " + listAttributeKeyName + " = :val")
-	                    .expressionAttributeValues(attributeValues)
-	                    .build();
-
-	            dynamodbClient.updateItem(updateItemRequest);
-*/	          
-	            
 			} else {
 				// Exiting entry for this detected text exists./ Update the same
 				System.out.println("Existing entry, lets add to it");
@@ -135,37 +117,34 @@ public class ImageKeyUtils {
 		        attributesHashMap.put(pkKeyName, detectedTextToProcess);
 		        attributesHashMap.put("imageArtifacts", existingImageUrls +", " + imageUrl);
 		        ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);
-/*				
-	            Map<String, AttributeValue> itemKey = new HashMap<>();
-	            itemKey.put(pkKeyName, AttributeValue.builder().s(detectedTextToProcess).build());
-	            
-	         // New values to append
-	            AttributeValue newValues = AttributeValue.builder()
-	                    .l(Arrays.asList(AttributeValue.builder().s(imageUrl).build()))
-	                    .build();
-	            
-	            // Setting up the update expression to append newValues to the list
-	            String updateExpression = "SET " + listAttributeKeyName + " = list_append(" + listAttributeKeyName + ", :val)";
-
-	            Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-	            expressionAttributeValues.put(":val", newValues);
-
-	            UpdateItemRequest updateItemRequest = UpdateItemRequest.builder()
-	                    .tableName(ddbTableName)
-	                    .key(itemKey)
-	                    .updateExpression(updateExpression)
-	                    .expressionAttributeValues(expressionAttributeValues)
-	                    .build();
-
-	            dynamodbClient.updateItem(updateItemRequest);
-*/
 
 			}
+			
+			// Send message to Download Queue
+			insertToDownloadQueue(detectedTextToProcess);
 		}
 		
         
 		
 	}
 	
+	
+	private void insertToDownloadQueue(String message) {
+        SqsClient sqsClient = SqsClient.builder().build();
+
+		String queueUrl = "https://sqs.us-east-2.amazonaws.com/018701121298/ImagesReadyToDownload1"; 
+
+        try {
+            SendMessageRequest sendMsgRequest = SendMessageRequest.builder()
+                    .queueUrl(queueUrl)
+                    .messageBody(message)
+                    .build();
+            sqsClient.sendMessage(sendMsgRequest);
+        } catch (SqsException e) {
+            System.err.println(e.awsErrorDetails().errorMessage());
+            System.exit(1);
+        }
+			
+	}
 
 }

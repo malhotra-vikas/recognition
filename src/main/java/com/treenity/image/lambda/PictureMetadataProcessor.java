@@ -37,6 +37,39 @@ public class PictureMetadataProcessor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(PictureMetadataProcessor.class);
 
+	public ImageKeyUtils n(String keyValue) {
+    	String tableName = "ImageMetadata.1";
+        String keyColumn = "imageid"; // Replace with your key column name
+        String columnsToGet = "imageid, hiconfidenceImageText, imageurl"; // Comma-separated string of attributes to retrieve
+        
+    	DDBCrud crud = new DDBCrud();
+    	ImageKeyUtils imageKeyUtils = new ImageKeyUtils();
+
+        // Creating the DynamoDbClient object
+        DynamoDbClient ddb = DependencyFactory.ddbClient();   
+    	Map<String, AttributeValue> returnedItem;
+
+
+        // Construct the key with which to query
+        HashMap<String, AttributeValue> keyToGet = new HashMap<>();
+
+        keyToGet.put(keyColumn, AttributeValue.builder()
+                .s(keyValue) // .s for string type attributes, you can use .n for number types, etc.
+                .build());
+        
+    	returnedItem = crud.readItem(tableName, keyToGet, columnsToGet);
+    	imageKeyUtils.setImageId(returnedItem.get("imageid").s());
+    	imageKeyUtils.setImageURL(returnedItem.get("imageurl").s());
+    	imageKeyUtils.setHighConfidenceDetectedTextList(returnedItem.get("hiconfidenceImageText").s());
+
+        
+        // Close the DynamoDbClient
+        ddb.close();
+        
+        return imageKeyUtils;
+        
+    }
+	
 	public ImageKeyUtils testRead(String keyValue) {
     	String tableName = "ImageMetadata.1";
         String keyColumn = "imageid"; // Replace with your key column name
@@ -70,10 +103,10 @@ public class PictureMetadataProcessor {
         
     }
 	
-	public void processMetadata() {
+	public void processMetadata(String messageKey) {
     	String tableName = "ImageMetadata.1";
         String keyColumn = "imageid"; // Replace with your key column name
-        ArrayList<String> scannedKeys = new ArrayList<>();
+        //ArrayList<String> scannedKeys = new ArrayList<>();
 
         
     	DDBCrud crud = new DDBCrud();
@@ -81,15 +114,14 @@ public class PictureMetadataProcessor {
 
     	// Ideally this comes from a stream or a queue that has all Image Keys
     	
-    	scannedKeys = crud.fetchAllKeys(tableName, keyColumn);
-		System.out.println("scannedKeys size : " + scannedKeys.size());
+    	//scannedKeys = crud.fetchAllKeys(tableName, keyColumn);
+		//System.out.println("scannedKeys size : " + scannedKeys.size());
 
     	String keyToRead;
     	ArrayList<String> detectedTextList = null;
     	
     	
-    	for (int i=0; i<scannedKeys.size(); i++) {
-    		keyToRead = scannedKeys.get(i);
+    		keyToRead = messageKey;
     		detectedTextList = new ArrayList<String>();
     		
     		System.out.println("Key To read : " + keyToRead);
@@ -140,7 +172,6 @@ public class PictureMetadataProcessor {
                 e.printStackTrace();
             }
 
-    	}
                 
     }
 

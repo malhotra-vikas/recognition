@@ -49,7 +49,7 @@ public class DynamoDBACtionTest {
 
     	// Ideally this comes from a stream or a queue that has all Image Keys
     	
-    	scannedKeys = crud.fetchAllKeys(tableName, keyColumn);
+    	//scannedKeys = crud.fetchAllKeys(tableName, keyColumn);
 		System.out.println("scannedKeys size : " + scannedKeys.size());
 
     	String keyToRead;

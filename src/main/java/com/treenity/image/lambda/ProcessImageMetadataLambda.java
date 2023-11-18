@@ -7,6 +7,8 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SqsException;
 
 
 public class ProcessImageMetadataLambda {
@@ -27,7 +29,8 @@ public class ProcessImageMetadataLambda {
 	            // Delete the message to avoid re-processing
 	            deleteMessageFromQueue(msg);
 	            
-                metadataProcessor.processMetadata();
+                metadataProcessor.processMetadata(messageBody);
+                
         	}
         } else {
             logger.log("No messages received.");
@@ -35,6 +38,8 @@ public class ProcessImageMetadataLambda {
                 
         return null;
     }
+	
+	
 	
 	private void deleteMessageFromQueue(SQSEvent.SQSMessage msg) {
         SqsClient sqsClient = SqsClient.builder().build();

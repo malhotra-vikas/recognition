@@ -11,6 +11,7 @@ import com.treenity.image.recognition.utils.DependencyFactory;
 
 public class ScanImageMetadata {
 	
+	/*
 	public void scanTable(String tableName) {
         DynamoDbClient dynamodbClient = DependencyFactory.ddbClient();   
         //String ddbTableName = DependencyFactory.getDdbTableName_default()+"."+DependencyFactory.getCompanyID();
@@ -37,5 +38,6 @@ public class ScanImageMetadata {
             System.exit(1);
         }
 	}
+	*/
     
 }

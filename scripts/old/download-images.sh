@@ -64,8 +64,20 @@ echo "$ITEMS" | jq -c '.Items[]' | while read -r ITEM; do
     echo "Creating directory $DIR_PATH"
 
     mkdir -p "$DIR_PATH"
+done
 
-    # Split the imageArtifacts by comma and download each file
+COMMA_COUNT=1
+ # Iterate on items and download images to the directories
+echo "$ITEMS" | jq -c '.Items[]' | while read -r ITEM; do
+    # Extract detectedText and imageArtifacts
+    DETECTED_TEXT=$(echo "$ITEM" | jq -r '.detectedText.S')
+    IMAGE_ARTIFACTS=$(echo "$ITEM" | jq -r '.imageArtifacts.S')
+    #echo "Detected Text $DETECTED_TEXT"
+
+    # Create a directory for detectedText
+    DIR_PATH="$LOCAL_DIRECTORY/$DETECTED_TEXT"
+
+# Split the imageArtifacts by comma and download each file
     IFS=',' read -ra ADDR <<< "$IMAGE_ARTIFACTS"
     for URL in "${ADDR[@]}"; do
         FILE_NAME=$(basename "$URL")
@@ -74,8 +86,9 @@ echo "$ITEMS" | jq -c '.Items[]' | while read -r ITEM; do
         S3URL="s3://$S3_BUCKET/$FILE_NAME"
 
         aws s3 cp "$S3URL" "$DIR_PATH/$FILE_NAME"
+        COMMA_COUNT=$COMMA_COUNT+1
     done
 
+echo "Number of Pictures for $DETECTED_TEXT are $COMMA_COUNT"
+
 done
-
-
