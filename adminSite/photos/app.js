@@ -22,29 +22,76 @@ function fetchAndDisplayFotos(binToSearch) {
 
 	// Define the parameters for scanning the DynamoDB table
 	const params = {
-		TableName: tableName,
-		Key: {
-    		binAttribute: binToSearch, // Specify the primary key attribute and its value
-  		},
+	  TableName: tableName,
+	  KeyConditionExpression: "detectedText = :value",
+	  ExpressionAttributeValues: {
+	    ":value": binToSearch,
+	  },
 	};
 
 	// Use the DynamoDB scan operation to retrieve all items from the table
-	dynamodb.get(params, (error, data) => {
+	dynamodb.query(params, (error, data) => {
 		if (error) {
 			console.error("Error fetching events from DynamoDB:", error);
 		} else {
-			// Clear existing eventList content
-			const binList = document.getElementById("binList");
-			binList.innerHTML = "";
+			const photosContainer = document.getElementById("photosContainer");
+			
+			// Clear the existing content inside the container
+			photosContainer.innerHTML = "";
 
-			// Handle the retrieved event data here
-			const binDataItem = data.Item; // The item with the specified event ID
-			console.log("Retrieved Event Data:", binDataItem);
+
+			const searchResultItems = data.Items;
+    		console.log("Items with detectedText value :", searchResultItems);
 			
-			const imageArtifacts = binDataItem[fotosAttribute]; // Assuming you have an "eventName" attribute in your DynamoDB table
+			if (searchResultItems && searchResultItems.length > 0) {
+			  // Iterate through the retrieved items
+			  searchResultItems.forEach((item) => {
+			    // Access attributes by their attribute names
+			    const detectedText = item.detectedText; // Replace with your actual attribute name
+			    const imageArtifacts = item.imageArtifacts; // Replace with your actual attribute name
 			
-			console.log("Retrieved for Bin:", binToSearch);
-			console.log("Retrieved imageArtifacts:", imageArtifacts);
+			    // You can now work with the values of the attributes
+			    console.log("Detected Text:", detectedText);
+			    console.log("Image Artifacts:", imageArtifacts);
+			    
+				// Split the imageArtifactsString into an array using ', ' as the delimiter
+        		const imageArtifactsArray = imageArtifacts.split(', ');
+        		// Create a new table for each set of URLs
+		        const table = document.createElement("table");
+		        table.className = "image-table"; // You can define CSS styles for this class
+		        
+		        // Iterate through the individual URLs in the array and create table rows
+		        imageArtifactsArray.forEach((url) => {
+		            const row = table.insertRow();
+		            const cell = row.insertCell();
+		            
+				    // Create an anchor element with the URL as the href attribute
+		            const link = document.createElement("a");
+		            link.href = url;
+		            link.textContent = url;
+            
+					cell.appendChild(link);		
+		            // You can apply additional styling or functionality to the cells as needed
+		        });
+		        
+		        // Add the table to the container
+        		photosContainer.appendChild(table);
+        		
+        		// Add a separator (optional) between tables
+		        if (index < data.Items.length - 1) {
+		            const separator = document.createElement("hr");
+		            separator.className = "separator";
+		            container.appendChild(separator);
+		        }
+			    
+
+			
+			    // Perform any other processing you need with the values
+			  });
+			} else {
+			  console.log("No items found with the specified detectedText value.");
+			}
+
 
 			/*const eventRow = document.createElement("tr");
 			const eventNameCell = document.createElement("td");
