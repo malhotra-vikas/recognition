@@ -1,137 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Image Upload</title>
+    <title>Admin Portal</title>    
+    <link rel="stylesheet" type="text/css" href="styles.css"> <!-- Link to styles.css -->
+
 </head>
 <body>
-    <h1>Image Upload</h1>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <label for="eventName">Event Name:</label>
-        <input type="text" id="eventName" name="eventName" required>
-        
-        <br><br>
 
-        <label for="photographerName">Photographer Name:</label>
-        <input type="text" id="photographerName" name="photographerName" required>
-        <br><br>
+    <ul class="nav-menu">
+        <li class="nav-item"><a href="events/index.html">Events</a></li>
+        <li class="nav-item"><a href="photographers/index.html">Photographers</a></li>
+        <li class="nav-item"><a href="photos/index.html">Photos</a></li>
+    </ul>
 
-        <label for="imageFolder">Select a Local Folder:</label>
-        <input type="file" id="imageFolder" name="imageFolder" webkitdirectory directory multiple accept="image/jpeg" required>
-        <br><br>
+    <section id="events">
+        <h1>Events Management</h1>
+        <!-- Content for the Events section goes here -->
+    </section>
 
-        <input type="submit" value="Upload Images">
-    </form>
+    <section id="photographers">
+        <h1>Photographers Management</h1>
+        <!-- Content for the Photographers section goes here -->
+    </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
-
-    <script>
-    
-	    // Initialize AWS SDK and configure S3
-	    AWS.config.region = 'us-east-2'; // Replace with your AWS region
-	    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-	        IdentityPoolId: 'us-east-2:48eebc1f-183c-4a21-b1d3-aed2062eab7f' // Replace with your Cognito Identity Pool ID
-	    });
-	
-	    var s3 = new AWS.S3();
-	    var sqs = new AWS.SQS();
-	    
-	    
-        document.getElementById("uploadForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            var eventName = document.getElementById("eventName").value;
-            var photographerName = document.getElementById("photographerName").value;
-            var imageFolder = document.getElementById("imageFolder").files;
-            var error = 0;
-
-            if (imageFolder.length === 0) {
-                alert("Please select a local folder with JPG images.");
-                return;
-            }
-
-         // Define a variable to track the number of completed uploads
-            var completedUploads = 0;
-         
-            function handleUploadCompletion(error) {
-                if (error == 1) {
-                	document.write("An error occured while uploading images")
-                    console.log("An error occured while uploading images");
-                } else {
-                	document.write("Successfully uploaded all images")
-                    console.log("Successfully uploaded all images");
-                }
-            }
-            
-            // Function to recursively upload images to S3
-            function uploadImages(index) {
-                if (index < imageFolder.length) {
-                    var file = imageFolder[index];
-                    var fileName = file.webkitRelativePath; // Get the full path of the image
-                    var fileExtension = fileName.split('.').pop(); // Get the file extension
-                    var imageName = fileName.split("/").pop();
-                    var message = eventName+":"+photographerName+":"+imageName;
-                                        
-                    if (fileExtension.toLowerCase() === 'jpg' || fileExtension.toLowerCase() === 'jpeg') {
-                        var params = {
-                            Bucket: 'mediastore.primary.1', // Replace with your S3 bucket name
-                            Key: `${eventName}/${photographerName}/${imageName}`, // S3 object key
-                            //Key: `${eventName}/${photographerName}/${file}`, // S3 object key
-                            Body: file // Image file to upload
-                        };
-
-                        const sqsMessageParams = {
-                            QueueUrl: 'https://sqs.us-east-2.amazonaws.com/018701121298/ImagesUploaded1',
-                            MessageBody: message
-                        };
-                        console.log("Uploading" + params.Key);
-
-
-                        s3.upload(params, function (err, data) {
-                            if (err) {
-                                console.error("Error uploading image:", err);
-                                error = 1;
-                            } else {
-                                console.log("Image uploaded successfully:", data.Location);
-                                uploadImages(index + 1); // Upload the next image
-
-
-                                // Now send the message to the queue
-                                sqs.sendMessage(sqsMessageParams, (err, data) => {
-                                    if (err) {
-                                        console.log(err);
-                                        error = 1;
-                                    } else {
-                                        console.log('Message sent successfully.');
-                                    }
-                                });
-
-                                
-                                console.log("Message being sent is "+ message);
-                            }
-                        });
-                    } else {
-                        // Skip non-JPG files
-                        uploadImages(index + 1);
-                    }
-                    
-                    // Increment the completedUploads count
-                    completedUploads++;
-                    
-                    // Check if all uploads are completed
-                    if (completedUploads === imageFolder.length) {
-                        handleUploadCompletion(error);
-                    }
-                }
-
-            }
-
-            
-            // Start uploading images
-            uploadImages(0);
-            
-            
-        });
-    </script>
+    <section id="photos">
+        <h1>Photos Management</h1>
+        <!-- Content for the Photos section goes here -->
+    </section>
 
 </body>
 </html>

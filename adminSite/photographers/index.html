@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Photographers Management Page</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css"> <!-- Link to styles.css -->
+
+
+</head>
+<body>
+	<h1>Photographers</h1>
+	
+    <ul class="nav-menu">
+        <li class="nav-item"><a href="/events/index.html">Events</a></li>
+        <li class="nav-item"><a href="/photographers/index.html">Photographers</a></li>
+        <li class="nav-item"><a href="/photos/index.html">Photos</a></li>
+    </ul>
+    
+	<h2>Create New Photographer</h2>
+	<form id="photographerForm">
+		<label for="photographerName">Photographer Name:</label> <input type="text"
+			id="photographerName" name="photographerName" required> <input
+			type="submit" value="Create Photographer">
+	</form>
+
+	<h2>Registered Photographers</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Photographer Name</th>
+				<th>Photographer Rate</th>
+			</tr>
+		</thead>
+		<tbody id="photographerList">
+			<!-- Existing events will be displayed here -->
+		</tbody>
+	</table>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
+	<script src="../aws-config.js"></script>
+	<script src="app.js"></script>
+</body>
+</html>

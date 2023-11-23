@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Download Photos</title>
+    <link rel="stylesheet" type="text/css" href="../styles.css"> <!-- Link to styles.css -->
+
+
+</head>
+<body>
+	<h1>Search and Download Fotos</h1>
+    <ul class="nav-menu">
+        <li class="nav-item"><a href="/events/index.html">Events</a></li>
+        <li class="nav-item"><a href="/photographers/index.html">Photographers</a></li>
+        <li class="nav-item"><a href="/photos/index.html">Photos</a></li>
+    </ul>
+    
+	<h2>Search by bin</h2>
+	<form id="binForm">
+		<label for="binName">Enter full bin (including zeros):</label> <input type="text"
+			id="binName" name="binName" required> <input
+			type="submit" value="Search Fotos">
+	</form>
+
+	<h2>Fotos for bin</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Bin number</th>
+				<th>Link to Fotos</th>
+			</tr>
+		</thead>
+		<tbody id="binList">
+			<!-- Existing events will be displayed here -->
+		</tbody>
+	</table>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
+	<script src="../aws-config.js"></script>
+	<script src="app.js"></script>
+</body>
+</html>
