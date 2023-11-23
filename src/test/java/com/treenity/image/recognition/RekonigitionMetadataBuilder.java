@@ -79,7 +79,7 @@ public class RekonigitionMetadataBuilder {
 
 // Detect Text
 
-            detectedTextToProcess = rekognitionHandler.detectText(rekClient, S3bucket, keyToProcess);
+            detectedTextToProcess = rekognitionHandler.detectText(rekClient, S3bucket, "", keyToProcess);
             //System.out.println("Iterating Detected Text - Text - " + detectedTextToProcess);
             
             JsonFilter jsonFilter = new JsonFilter();

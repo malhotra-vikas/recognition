@@ -15,6 +15,12 @@ public class ProcessImageMetadataLambda {
 	PictureMetadataProcessor metadataProcessor = new PictureMetadataProcessor();
 	LambdaLogger logger = null;
 	
+	String eventName;
+    String photographerId;
+    String imageId;
+    int firstIndex;
+    int lastIndex;
+	
 	public Void handleRequest(SQSEvent event, Context context) {
 	    logger = context.getLogger();
 
@@ -25,12 +31,26 @@ public class ProcessImageMetadataLambda {
                 
         		String messageBody = msg.getBody();
         		logger.log("Gotcha Received message: " + messageBody);
+	            // MessadgeBosy has EventName:PhotographerName:ImageId
 
+	            //Event1:Vikas:DSC_65675.jpg
+        		
 	            // Delete the message to avoid re-processing
 	            deleteMessageFromQueue(msg);
 	            
-                metadataProcessor.processMetadata(messageBody);
-                
+	          //Event1:Vikas:DSC_65675.jpg
+	            firstIndex = messageBody.indexOf(":");
+	            eventName = messageBody.substring(0, firstIndex);	    
+        		logger.log("eventName  -:" + eventName);
+
+        		lastIndex = messageBody.lastIndexOf(":");
+	            photographerId = messageBody.substring(eventName.length()+1, lastIndex);
+        		logger.log("photographerName  -:" + photographerId);
+        		
+        		imageId = messageBody.substring(lastIndex+1, messageBody.length());
+        		logger.log("imageId  -:" + imageId);
+        		
+                metadataProcessor.processMetadata(eventName, photographerId, imageId);
         	}
         } else {
             logger.log("No messages received.");

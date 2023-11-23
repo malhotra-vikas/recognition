@@ -1,47 +1,137 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>fotos recognition</title>
-    <script>
-        // Function to handle the form submission
-        function submitForm() {
-            // Prevent the default form behavior
-            event.preventDefault();
-
-            // Get the value from the text input
-            var userInput = document.getElementById('textInput').value;
-
-            // Lambda API Endpoint URL
-            var apiEndpoint = 'YOUR_LAMBDA_API_ENDPOINT_URL';
-
-            // Create the request
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', apiEndpoint, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-
-            // Define what happens on successful data submission
-            xhr.onload = function () {
-                // Process the response here
-                console.log(xhr.responseText);
-                alert('Response received: ' + xhr.responseText);
-            };
-
-            // Define what happens in case of an error
-            xhr.onerror = function () {
-                console.log('Request error...');
-            };
-
-            // Setup and send the request
-            var data = JSON.stringify({ "userInput": userInput });
-            xhr.send(data);
-        }
-    </script>
+    <title>Image Upload</title>
 </head>
 <body>
-    <h1>Submit to Lambda API</h1>
-    <form onsubmit="submitForm()">
-        <input type="text" id="textInput" placeholder="Enter text">
-        <input type="submit" value="Submit">
+    <h1>Image Upload</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="eventName">Event Name:</label>
+        <input type="text" id="eventName" name="eventName" required>
+        
+        <br><br>
+
+        <label for="photographerName">Photographer Name:</label>
+        <input type="text" id="photographerName" name="photographerName" required>
+        <br><br>
+
+        <label for="imageFolder">Select a Local Folder:</label>
+        <input type="file" id="imageFolder" name="imageFolder" webkitdirectory directory multiple accept="image/jpeg" required>
+        <br><br>
+
+        <input type="submit" value="Upload Images">
     </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
+
+    <script>
+    
+	    // Initialize AWS SDK and configure S3
+	    AWS.config.region = 'us-east-2'; // Replace with your AWS region
+	    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+	        IdentityPoolId: 'us-east-2:48eebc1f-183c-4a21-b1d3-aed2062eab7f' // Replace with your Cognito Identity Pool ID
+	    });
+	
+	    var s3 = new AWS.S3();
+	    var sqs = new AWS.SQS();
+	    
+	    
+        document.getElementById("uploadForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            var eventName = document.getElementById("eventName").value;
+            var photographerName = document.getElementById("photographerName").value;
+            var imageFolder = document.getElementById("imageFolder").files;
+            var error = 0;
+
+            if (imageFolder.length === 0) {
+                alert("Please select a local folder with JPG images.");
+                return;
+            }
+
+         // Define a variable to track the number of completed uploads
+            var completedUploads = 0;
+         
+            function handleUploadCompletion(error) {
+                if (error == 1) {
+                	document.write("An error occured while uploading images")
+                    console.log("An error occured while uploading images");
+                } else {
+                	document.write("Successfully uploaded all images")
+                    console.log("Successfully uploaded all images");
+                }
+            }
+            
+            // Function to recursively upload images to S3
+            function uploadImages(index) {
+                if (index < imageFolder.length) {
+                    var file = imageFolder[index];
+                    var fileName = file.webkitRelativePath; // Get the full path of the image
+                    var fileExtension = fileName.split('.').pop(); // Get the file extension
+                    var imageName = fileName.split("/").pop();
+                    var message = eventName+":"+photographerName+":"+imageName;
+                                        
+                    if (fileExtension.toLowerCase() === 'jpg' || fileExtension.toLowerCase() === 'jpeg') {
+                        var params = {
+                            Bucket: 'mediastore.primary.1', // Replace with your S3 bucket name
+                            Key: `${eventName}/${photographerName}/${imageName}`, // S3 object key
+                            //Key: `${eventName}/${photographerName}/${file}`, // S3 object key
+                            Body: file // Image file to upload
+                        };
+
+                        const sqsMessageParams = {
+                            QueueUrl: 'https://sqs.us-east-2.amazonaws.com/018701121298/ImagesUploaded1',
+                            MessageBody: message
+                        };
+                        console.log("Uploading" + params.Key);
+
+
+                        s3.upload(params, function (err, data) {
+                            if (err) {
+                                console.error("Error uploading image:", err);
+                                error = 1;
+                            } else {
+                                console.log("Image uploaded successfully:", data.Location);
+                                uploadImages(index + 1); // Upload the next image
+
+
+                                // Now send the message to the queue
+                                sqs.sendMessage(sqsMessageParams, (err, data) => {
+                                    if (err) {
+                                        console.log(err);
+                                        error = 1;
+                                    } else {
+                                        console.log('Message sent successfully.');
+                                    }
+                                });
+
+                                
+                                console.log("Message being sent is "+ message);
+                            }
+                        });
+                    } else {
+                        // Skip non-JPG files
+                        uploadImages(index + 1);
+                    }
+                    
+                    // Increment the completedUploads count
+                    completedUploads++;
+                    
+                    // Check if all uploads are completed
+                    if (completedUploads === imageFolder.length) {
+                        handleUploadCompletion(error);
+                    }
+                }
+
+            }
+
+            
+            // Start uploading images
+            uploadImages(0);
+            
+            
+        });
+    </script>
+
 </body>
 </html>

@@ -24,9 +24,9 @@ public class RekognitionHandler {
     
    
     
-    public String detectText(RekognitionClient rekClient, String bucket, String image) {
+    public String detectText(RekognitionClient rekClient, String bucket, String folderStructure, String image) {
     	DetectText detectText = new DetectText();
-    	return detectText.detectTextLabels(rekClient, bucket, image);
+    	return detectText.detectTextLabels(rekClient, bucket, folderStructure, image);
     }
     
     public List<ParsedText> buildHighConfidenceText(String parsedText) {

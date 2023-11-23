@@ -6,11 +6,13 @@ if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 }
 
 # Variables
-$localDirectory = "C:\Users\malho_5edpim1\OneDrive\Desktop\drop-fotos"
+$localDirectory = "/Users/vikasmalhotra/Downloads/drop-fotos"
 $scriptsDirectory = "C:\Users\malho_5edpim1\OneDrive\Desktop\scripts"
 
 $bucketName = "mediastore.primary.1"
-$destination = "s3://$bucketName/"
+$eventName = "De Marfta"
+$photographerName = "De Jose"
+$destination = "s3://$bucketName/$eventName/$photographerName"
 $imageUploadedQueueUrl = "https://sqs.us-east-2.amazonaws.com/018701121298/ImagesUploaded1"
 
 # Sync directory to S3
@@ -32,7 +34,9 @@ if ($LASTEXITCODE -eq 0) {
 
             # Message to send
             $message = $fileName
-
+            $message = $eventName + ":" + $photographerName + ":" + $fileName
+	    
+	    Write-Host $message
             # Send the message
             aws sqs send-message --queue-url $imageUploadedQueueUrl --message-body $message --region us-east-2
         }

@@ -3,7 +3,7 @@
 	<groupId>com.treenity.image</groupId>
 	<artifactId>recognition</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -17,6 +17,11 @@ public class GenerateImageMetadataLambda {
 	
 	public Void handleRequest(SQSEvent event, Context context) {
 	    logger = context.getLogger();
+	    String eventName;
+	    String photographerId;
+	    String imageId;
+	    int firstIndex;
+	    int lastIndex;
 
 
      // Iterate through all messages in the Queue, process and delete
@@ -30,7 +35,22 @@ public class GenerateImageMetadataLambda {
 	            // Delete the message to avoid re-processing
 	            deleteMessageFromQueue(msg);
 	            
-            	metadataBuilder.generateMetadata(messageBody);
+	            // MessadgeBosy has EventName:PhotographerName:ImageId
+
+	            //Event1:Vikas:DSC_65675.jpg
+	            firstIndex = messageBody.indexOf(":");
+	            eventName = messageBody.substring(0, firstIndex);	    
+        		logger.log("eventName  -:" + eventName);
+
+        		lastIndex = messageBody.lastIndexOf(":");
+	            photographerId = messageBody.substring(eventName.length()+1, lastIndex);
+        		logger.log("photographerName  -:" + photographerId);
+        		
+        		imageId = messageBody.substring(lastIndex+1, messageBody.length());
+        		logger.log("imageId  -:" + imageId);
+	            
+	            
+            	metadataBuilder.generateMetadata(eventName, photographerId, imageId);
             	
             	insertToProcessMetadataQueue(messageBody);
         	}

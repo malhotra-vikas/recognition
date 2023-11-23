@@ -1,7 +1,6 @@
 package com.treenity.image.lambda;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,26 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.treenity.image.ddb.DDBCrud;
-import com.treenity.image.recognition.s3.GetObjectUrl;
-import com.treenity.image.recognition.utils.DDBHandler;
 import com.treenity.image.recognition.utils.DependencyFactory;
 import com.treenity.image.recognition.utils.ImageKeyUtils;
-import com.treenity.image.recognition.utils.JsonFilter;
 import com.treenity.image.recognition.utils.NumberUtillity;
-import com.treenity.image.recognition.utils.ParsedText;
-import com.treenity.image.recognition.utils.RekognitionHandler;
-import com.treenity.image.recognition.utils.S3Handler;
-import org.apache.commons.lang3.math.NumberUtils;
-
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.rekognition.RekognitionClient;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class PictureMetadataProcessor {
 	
@@ -103,7 +89,7 @@ public class PictureMetadataProcessor {
         
     }
 	
-	public void processMetadata(String messageKey) {
+	public void processMetadata(String eventName, String photographerId, String imageId) {
     	String tableName = "ImageMetadata.1";
         String keyColumn = "imageid"; // Replace with your key column name
         //ArrayList<String> scannedKeys = new ArrayList<>();
@@ -121,7 +107,7 @@ public class PictureMetadataProcessor {
     	ArrayList<String> detectedTextList = null;
     	
     	
-    		keyToRead = messageKey;
+    		keyToRead = eventName+":"+photographerId+":"+imageId;
     		detectedTextList = new ArrayList<String>();
     		
     		System.out.println("Key To read : " + keyToRead);

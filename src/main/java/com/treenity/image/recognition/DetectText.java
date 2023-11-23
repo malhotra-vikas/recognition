@@ -51,21 +51,26 @@ public class DetectText {
     	
     }
     
-    public String detectTextLabels(RekognitionClient rekClient, String bucket, String image) {
+    public String detectTextLabels(RekognitionClient rekClient, String bucket, String folderStructure, String image) {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         try {
+            
+        	System.out.println(bucket);
+        	System.out.println(folderStructure);
+        	System.out.println(image);
         	
+            // Set the S3Object with the full object key
             S3Object s3Object = S3Object.builder()
                     .bucket(bucket)
-                    .name(image)
+                    .name(folderStructure + image)
                     .build();
 
-                Image souImage = Image.builder()
+            Image souImage = Image.builder()
                     .s3Object(s3Object)
                     .build();
-
+            
             DetectTextRequest textRequest = DetectTextRequest.builder()
                 .image(souImage)
                 .build();

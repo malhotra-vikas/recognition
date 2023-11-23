@@ -58,7 +58,6 @@ public class ImageKeyUtils {
 		DDBHandler ddbHandler = new DDBHandler();
 		DDBCrud crud = new DDBCrud();
 		
-		String imageId = imageKeyUtils.getImageId();
 		String imageUrl = imageKeyUtils.getImageURL();
 		ArrayList<String> detectedTextList = imageKeyUtils.getDetectedTextList();
 		String detectedTextToProcess;
