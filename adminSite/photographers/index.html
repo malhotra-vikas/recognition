@@ -17,8 +17,11 @@
     
 	<h2>Create New Photographer</h2>
 	<form id="photographerForm">
-		<label for="photographerName">Photographer Name:</label> <input type="text"
-			id="photographerName" name="photographerName" required> <input
+		<label for="photographerName">Photographer Name:</label> 
+		<input type="text"
+			id="photographerName" name="photographerName" required> 
+		<span id="nameError" style="color: red;"></span>
+		<input
 			type="submit" value="Create Photographer">
 	</form>
 
@@ -37,6 +40,6 @@
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
 	<script src="../aws-config.js"></script>
-	<script src="app.js"></script>
+	<script src="app.js?v=1"></script>
 </body>
 </html>

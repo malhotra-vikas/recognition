@@ -60,10 +60,26 @@ function fetchAndDisplayPhotographers() {
 function handleFormSubmission(event) {
 	event.preventDefault();
 
-
-
 	// Get the event name from the input field
 	const photographerName = document.getElementById("photographerName").value;
+	
+	console.log("photographerName " + photographerName);
+		// Define a regular expression to check for special characters
+	const specialCharsRegex = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\]/;
+	// Check if the eventName contains special characters
+	if (specialCharsRegex.test(photographerName)) {
+		// Display an error message
+		console.log("Name Validation Failed");
+
+		document.getElementById("nameError").textContent = "Photographer name cannot contain special characters.";
+		event.preventDefault(); // Prevent form submission
+		exit;
+	} else {
+		console.log("Name Validation Passed");
+
+		// Clear any previous error message
+		document.getElementById("nameError").textContent = "";
+	}
 
 	// Create an object to store event data
 	const photographerData = {
@@ -71,7 +87,7 @@ function handleFormSubmission(event) {
 	};
 
 	// Log the data to the console
-	console.log("New Event Data:", photographerData);
+	console.log("New Event Data 02:", photographerData);
 
 	// Add the new event to the DynamoDB table
 	const params = {

@@ -17,8 +17,11 @@
 
 	<h2>Create New Event</h2>
 	<form id="eventForm">
-		<label for="eventName">Event Name:</label> <input type="text"
-			id="eventName" name="eventName" required> <input
+		<label for="eventName">Event Name:</label> 
+		<input type="text"
+			id="eventName" name="eventName" required> 
+		<span id="eventNameError" style="color: red;"></span>
+		<input
 			type="submit" value="Create Event">
 	</form>
 
@@ -39,6 +42,6 @@
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
 	<script src="../aws-config.js"></script>
-	<script src="app.js"></script>
+	<script src="app.js?v=1"></script>
 </body>
 </html>

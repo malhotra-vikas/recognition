@@ -65,10 +65,25 @@ function fetchAndDisplayEvents() {
 function handleFormSubmission(event) {
 	event.preventDefault();
 
-
-
 	// Get the event name from the input field
 	const eventName = document.getElementById("eventName").value;
+	console.log("eventName " + eventName);
+
+	// Define a regular expression to check for special characters
+	const specialCharsRegex = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\]/;
+	// Check if the eventName contains special characters
+	if (specialCharsRegex.test(eventName)) {
+		console.log("Name Validation Failed");
+
+		// Display an error message
+		document.getElementById("eventNameError").textContent = "Event name cannot contain special characters.";
+		event.preventDefault(); // Prevent form submission
+		exit;
+	} else {
+		console.log("Name Validation Passed");
+		// Clear any previous error message
+		document.getElementById("eventNameError").textContent = "";
+	}
 
 	// Create an object to store event data
 	const eventData = {
@@ -76,7 +91,7 @@ function handleFormSubmission(event) {
 	};
 
 	// Log the data to the console
-	console.log("New Event Data:", eventData);
+	console.log("New Event Data 01:", eventData);
 
 	// Add the new event to the DynamoDB table
 	const params = {
