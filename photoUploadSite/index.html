@@ -1,61 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Image Upload</title>
+<title>Image Upload</title>
 </head>
 <body>
-    <h1>Image Upload</h1>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <label for="eventName">Event Name:</label>
-        <input type="text" id="eventName" name="eventName" required>
-        
-        <br><br>
+	<h1>Image Upload</h1>
+	<form id="uploadForm" enctype="multipart/form-data">
+		<label for="eventName">Event Name:</label> 
+		<select id="eventName" name="eventName" required></select> 
+			<br> <br> 
+		<label
+			for="photographerName">Photographer Name:</label> 
+			<select id="photographerName" name="photographerName" required></select> 
+			<br> <br> 
+		<label for="imageFolder">Select a Local Folder:</label> 
+		<input
+			type="file" id="imageFolder" name="imageFolder" webkitdirectory
+			directory multiple accept="image/jpeg" required> <br> <br>
+		<input type="submit" value="Upload Images">
+		
+	</form>
 
-        <label for="photographerName">Photographer Name:</label>
-        <input type="text" id="photographerName" name="photographerName" required>
-        <br><br>
-
-        <label for="imageFolder">Select a Local Folder:</label>
-        <input type="file" id="imageFolder" name="imageFolder" webkitdirectory directory multiple accept="image/jpeg" required>
-        <br><br>
-
-        <input type="submit" value="Upload Images">
-    </form>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
-
-    <script>
-    
-	    // Initialize AWS SDK and configure S3
-	    AWS.config.region = 'us-east-2'; // Replace with your AWS region
-	    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-	        IdentityPoolId: 'us-east-2:48eebc1f-183c-4a21-b1d3-aed2062eab7f' // Replace with your Cognito Identity Pool ID
-	    });
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
+	<script>
 	
-	    var s3 = new AWS.S3();
-	    var sqs = new AWS.SQS();
-	    
-	    
-        document.getElementById("uploadForm").addEventListener("submit", function (e) {
-            e.preventDefault();
+		AWS.config.region = 'us-east-2'; // Replace with your desired region
+		AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+			IdentityPoolId : 'us-east-2:48eebc1f-183c-4a21-b1d3-aed2062eab7f' // Replace with your Cognito Identity Pool ID
+			});
+		
+    	function handleFormSubmission(event) {
+            event.preventDefault();
 
             var eventName = document.getElementById("eventName").value;
             var photographerName = document.getElementById("photographerName").value;
             var imageFolder = document.getElementById("imageFolder").files;
             var error = 0;
+            var completedUploads = 0;
 
             if (imageFolder.length === 0) {
                 alert("Please select a local folder with JPG images.");
                 return;
             }
 
-         // Define a variable to track the number of completed uploads
-            var completedUploads = 0;
          
             function handleUploadCompletion(error) {
                 if (error == 1) {
                 	document.write("An error occured while uploading images")
                     console.log("An error occured while uploading images");
+
                 } else {
                 	document.write("Successfully uploaded all images")
                     console.log("Successfully uploaded all images");
@@ -130,8 +124,9 @@
             uploadImages(0);
             
             
-        });
+        };
     </script>
 
+	<script src="app.js?v=1"></script>
 </body>
 </html>
