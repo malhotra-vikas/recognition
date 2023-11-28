@@ -14,8 +14,62 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// Add an event listener for the form submission
 	document.getElementById("binForm").addEventListener("submit", handleFormSubmission);
-	document.getElementById('downloadBinImagesButton').addEventListener('click', downloadBinImages);
+	//document.getElementById('downloadBinImagesButton').addEventListener('click', downloadBinImages);
+	document.getElementById('downloadAllButton').addEventListener('click', downloadAllImagesForBin);
 });
+
+function downloadAllImagesForBin(imageUrls, bin) {
+    // Select all image elements within the photosContainer
+    const images = document.querySelectorAll('#photosContainer a');
+	console.log("Attempting to doaload all images for the bin " + images.length);
+
+	console.log("Attempting to check if passed param is good " + imageUrls);
+
+    // Create an array to store the fetch promises
+    const fetchPromises = [];
+
+    // Create a zip file to store the images
+    const zip = new JSZip();
+
+    // Iterate through the images and add them to the zip file
+    images.forEach((image, index) => {
+        const imageUrl = image;
+        console.log("Image URL to fetch is - " + imageUrl);
+		// Split the URL by '/' to get the parts
+		const parts = String(imageUrl).split('/');
+
+		// The last part (after the last '/') should be the image name
+		const imageName = parts[parts.length - 1];
+
+		console.log("Image Name:", imageName);
+
+        fetchPromises.push(
+	        fetch(imageUrl)
+	            .then(response => response.blob())
+	            .then(blob => {
+	                zip.file(imageName, blob);
+	            })
+	        );
+    });
+
+    bin = document.getElementById("binName").value;
+
+    // Wait for all fetch operations to complete
+    Promise.all(fetchPromises)
+        .then(() => {
+        	// Generate and trigger the download of the zip file
+		    zip.generateAsync({ type: 'blob' }).then(function(content) {
+		        const downloadLink = document.createElement('a');
+		        downloadLink.href = URL.createObjectURL(content);
+		        downloadLink.download = bin + '.zip'; // Customize the zip file name if needed
+		        downloadLink.click();
+    		});
+    	})
+	    .catch(error => {
+	            console.error("Error fetching images:", error);
+	        });
+
+	}
 
 
 // Function to fetch and display events
@@ -176,8 +230,4 @@ function handleFormSubmission(event) {
 	console.log("Start searching for bin - " + binName);
 
 	fetchAndDisplayFotos(binName);
-
-
-	// Clear the input field
-	document.getElementById("binName").value = "";
 }

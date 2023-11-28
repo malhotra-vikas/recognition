@@ -4,7 +4,6 @@
 	<title>Download Photos</title>
     <link rel="stylesheet" type="text/css" href="../styles.css"> <!-- Link to styles.css -->
 
-
 </head>
 <body>
 	<h1>Search and Download Fotos</h1>
@@ -22,13 +21,16 @@
 	</form>
 
 	<h2>Fotos for bin</h2>
+	<button id="downloadAllButton">Download All Images</button>
+	<!--button id="downloadBinImagesButton">Download All Images</button-->
+
 	    <!-- Container to hold the tables -->
     <div id="photosContainer"></div>
-    <!-- button id="downloadBinImagesButton">Download All Images</button-->
     
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1152.0/aws-sdk.min.js"></script>
 	<script src="../aws-config.js"></script>
 	<script src="app.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
 </body>
 </html>
