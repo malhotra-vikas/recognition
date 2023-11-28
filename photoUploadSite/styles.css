@@ -83,3 +83,19 @@ h1 {
 .separator {
 	margin-top: 20px;
 }
+
+#progress {
+  width: 100%;
+  background-color: #f0f0f0;
+}
+
+#progress-bar {
+  height: 20px;
+  background-color: #4CAF50;
+  width: 0;
+}
+
+#progress-text {
+  margin-top: 5px;
+  text-align: center;
+}

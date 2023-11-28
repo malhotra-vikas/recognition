@@ -18,6 +18,13 @@
 			type="file" id="imageFolder" name="imageFolder" webkitdirectory
 			directory multiple accept="image/jpeg" required> <br> <br>
 		<input type="submit" value="Upload Images">
+
+        <div id="progress">
+            <div id="progress-bar"></div>
+            <p id="progress-text">0 / 0</p>
+        </div>
+        <span id="completionNotification" style="color: red;"></span>
+
 		
 	</form>
 
@@ -30,6 +37,17 @@
 			IdentityPoolId : 'us-east-2:48eebc1f-183c-4a21-b1d3-aed2062eab7f' // Replace with your Cognito Identity Pool ID
 			});
 		
+        function updateProgressBarAndCount(completedUploads, imageFolderLength) {
+            // Calculate the progress percentage
+            var percent = (completedUploads / imageFolderLength) * 100;
+
+            // Update the progress bar width
+            document.getElementById("progress-bar").style.width = percent + "%";
+
+            // Update the count text
+            document.getElementById("progress-text").textContent = completedUploads + " / " + imageFolderLength;
+        }
+
     	function handleFormSubmission(event) {
             event.preventDefault();
 
@@ -47,12 +65,9 @@
          
             function handleUploadCompletion(error) {
                 if (error == 1) {
-                	document.write("An error occured while uploading images")
-                    console.log("An error occured while uploading images");
-
+                    document.getElementById("completionNotification").textContent = "An error occured while uploading images.";
                 } else {
-                	document.write("Successfully uploaded all images")
-                    console.log("Successfully uploaded all images");
+                    document.getElementById("completionNotification").textContent = "Successfully uploaded all images.";
                 }
             }
             
@@ -64,7 +79,7 @@
                     var fileExtension = fileName.split('.').pop(); // Get the file extension
                     var imageName = fileName.split("/").pop();
                     var message = eventName+":"+photographerName+":"+imageName;
-                                        
+
                     if (fileExtension.toLowerCase() === 'jpg' || fileExtension.toLowerCase() === 'jpeg') {
                         var params = {
                             Bucket: 'mediastore.primary.1', // Replace with your S3 bucket name
@@ -88,6 +103,9 @@
                                 console.log("Image uploaded successfully:", data.Location);
                                 uploadImages(index + 1); // Upload the next image
 
+                                // Update the progress bar and count
+                                updateProgressBarAndCount(index + 1, imageFolder.length);
+
 
                                 // Now send the message to the queue
                                 sqs.sendMessage(sqsMessageParams, (err, data) => {
@@ -98,10 +116,15 @@
                                         console.log('Message sent successfully.');
                                     }
                                 });
-
-                                
+       
                                 console.log("Message being sent is "+ message);
                             }
+                        }).on('httpUploadProgress', function (progress) {
+                            // Calculate the progress percentage
+                            var percent = (progress.loaded / progress.total) * 100;
+
+                            // Update the progress bar width
+                            document.getElementById("progress-bar").style.width = percent + "%";
                         });
                     } else {
                         // Skip non-JPG files

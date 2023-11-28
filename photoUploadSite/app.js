@@ -5,7 +5,7 @@ var dynamodb = new AWS.DynamoDB.DocumentClient();
 
 // Add an event listener for the "DOMContentLoaded" event
 document.addEventListener("DOMContentLoaded", function() {
-
+	document.getElementById("completionNotification").textContent = "";
 	// Call the fetchAndDisplayEvents function when the page loads
 	fetchEventNames();
 	fetchPhotographersNames();
@@ -83,4 +83,6 @@ function fetchPhotographersNames() {
 		});
 	});
 }
+
+
 
