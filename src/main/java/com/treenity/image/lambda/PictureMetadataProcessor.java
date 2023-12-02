@@ -151,7 +151,7 @@ public class PictureMetadataProcessor {
                 //System.out.println(imageKeyUtils.getImageURL());
                 System.out.println("Number only detected text Size : " + imageKeyUtils.getDetectedTextList().size());
                 
-                imageKeyUtils.transformAndPersistToDDB(imageKeyUtils);
+                imageKeyUtils.transformAndPersistToDDB(imageKeyUtils, eventName);
                 
 
             } catch (IOException e) {

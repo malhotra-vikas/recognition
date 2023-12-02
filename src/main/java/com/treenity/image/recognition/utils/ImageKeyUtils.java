@@ -1,7 +1,9 @@
 package com.treenity.image.recognition.utils;
 
+import java.awt.ItemSelectable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
 
@@ -10,6 +12,7 @@ import com.treenity.image.ddb.DDBCrud;
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
@@ -51,7 +54,7 @@ public class ImageKeyUtils {
 		this.detectedTextList = detectedTextList;
 	}
 	
-	public void transformAndPersistToDDB(ImageKeyUtils imageKeyUtils) {
+	public void transformAndPersistToDDB(ImageKeyUtils imageKeyUtils, String eventName) {
 		
 		HashMap<String, String> imageKeyUrlMap = new HashMap<String, String>();
 		HashMap<String, HashMap<String, String>> persistenceReadyMap = new HashMap<>();
@@ -64,56 +67,85 @@ public class ImageKeyUtils {
         DynamoDbClient dynamodbClient = DependencyFactory.ddbClient();   
 		
 		Map<String, AttributeValue> fetchedEntry = null;
+		Map<String, AttributeValue> fetchedEventEntry = null;
 		
 		int size = detectedTextList.size();
         //System.out.println(size);
 
 		for (int i=0; i<size; i++) {
 			fetchedEntry = null;
+			fetchedEventEntry = null;
 			
 			detectedTextToProcess = detectedTextList.get(i);
 			//System.out.println("detectedTextToProcess : " + detectedTextToProcess);
 
 			
-			// Fetch an existing Entry for the detectedText
-			fetchedEntry = ddbHandler.fetchDDBEntry(detectedTextToProcess);
-			
-			
-			System.out.println("Number of Existing entries for selected detectedTextToProcess :"+ fetchedEntry.size());
+			// Fetch an existing Entry for the detectedText and Event
+			QueryResponse queryResponse = ddbHandler.fetchDDBEntry(detectedTextToProcess, eventName);
+			if (queryResponse != null) {
+				
+				try {
+					fetchedEntry = queryResponse.items().get(0);
+					System.out.println("Fetched existing entry for this compination :");
+
+				} catch (java.lang.IndexOutOfBoundsException e) {
+					// TODO Auto-generated catch block
+					System.out.println("No entry for this compination :");
+					fetchedEntry = null;
+				}
+			}
+			// Process the query results
+			/*
+			 * for (Map<String, AttributeValue> item : queryResponse.items()) { // Access
+			 * the selected attributes String attribute1Value = item.get("Attribute1").s();
+			 * String attribute2Value = item.get("Attribute2").s();
+			 * 
+			 * System.out.println("Attribute1: " + attribute1Value);
+			 * System.out.println("Attribute2: " + attribute2Value); }
+			 */
 			//System.out.println(fetchedEntry.size());
 
-            String ddbTableName = "recognizedText.1";
+            String ddbTableName = DependencyFactory.getDetectedTextddbTableName();
+            
             String pkKeyName = "detectedText";
+            String eventNameKey = "eventName";
             String listAttributeKeyName = "imageArtifacts";
             
 			// If existing entry does not exist 
 			if (fetchedEntry == null || fetchedEntry.size() == 0)  {
-				// Exiting entry for this detected text does not exists./ Create a new one
+				//Exiting entry for this detected text does not exists./ Create a new one
+				System.out.println("No Existing entry, lets create new");
 
 		        HashMap<String, String> attributesHashMap = new HashMap<>();
 		        attributesHashMap.put(pkKeyName, detectedTextToProcess);
+		        attributesHashMap.put(eventNameKey, eventName);
 		        attributesHashMap.put("imageArtifacts", imageUrl);
 		        ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);
 			} else {
-				// Exiting entry for this detected text exists./ Update the same
+				// 
 				System.out.println("Existing entry, lets add to it");
 				String existingImageUrls = null;
-		    	Map<String, AttributeValue> existingItem;
-
-		        // Construct the key with which to query
-		        HashMap<String, AttributeValue> keyToGet = new HashMap<>();
-
-		        keyToGet.put(pkKeyName, AttributeValue.builder()
-		                .s(detectedTextToProcess) // .s for string type attributes, you can use .n for number types, etc.
-		                .build());
+				/*
+				 * Map<String, AttributeValue> existingItem;
+				 * 
+				 * // Construct the key with which to query HashMap<String, AttributeValue>
+				 * keyToGet = new HashMap<>();
+				 * 
+				 * keyToGet.put(pkKeyName, AttributeValue.builder() .s(detectedTextToProcess) //
+				 * .s for string type attributes, you can use .n for number types, etc.
+				 * .build()); keyToGet.put(eventNameKey, AttributeValue.builder() .s(eventName)
+				 * // .s for string type attributes, you can use .n for number types, etc.
+				 * .build()); existingItem = crud.readItem(ddbTableName, keyToGet,
+				 * listAttributeKeyName);
+				 */
 		        
-		        existingItem = crud.readItem(ddbTableName, keyToGet, listAttributeKeyName);
-		    	existingImageUrls = existingItem.get(listAttributeKeyName).s();
+		    	existingImageUrls = fetchedEntry.get(listAttributeKeyName).s();
 				System.out.println("existingImageUrls - " + existingImageUrls);
 
 				
 		        HashMap<String, String> attributesHashMap = new HashMap<>();
 		        attributesHashMap.put(pkKeyName, detectedTextToProcess);
+		        attributesHashMap.put(eventNameKey, eventName);
 		        attributesHashMap.put("imageArtifacts", existingImageUrls +", " + imageUrl);
 		        ddbHandler.putItemInTable(dynamodbClient, ddbTableName, attributesHashMap);
 

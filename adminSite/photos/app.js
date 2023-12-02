@@ -2,7 +2,7 @@
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 // Define the DynamoDB table name
-const tableName = "recognizedText.1"; // Replace with your DynamoDB table name
+const tableName = "recognizedTextEvent"; // Replace with your DynamoDB table name
 
 // Define the attribute name for event name
 const binAttribute = "detectedText";
@@ -12,19 +12,145 @@ const fotosAttribute = "imageArtifacts";
 // Add an event listener for the "DOMContentLoaded" event
 document.addEventListener("DOMContentLoaded", function() {
 
+// Call the fetchAndDisplayEvents function when the page loads
+	//fetchEventNames();
+	
 	// Add an event listener for the form submission
 	document.getElementById("binForm").addEventListener("submit", handleFormSubmission);
 	//document.getElementById('downloadBinImagesButton').addEventListener('click', downloadBinImages);
 	document.getElementById('downloadAllButton').addEventListener('click', downloadAllImagesForBin);
 });
 
+        // Function to show the spinner
+        function showSpinner() {
+            document.getElementById("spinner-container").style.display = "flex";
+        }
+
+        // Function to hide the spinner
+        function hideSpinner() {
+            document.getElementById("spinner-container").style.display = "none";
+        }
+
+        function updateProgressBarAndCount(completedDownloads, imageFolderLength) {
+            // Calculate the progress percentage
+            var percent = (completedDownloads / imageFolderLength) * 100;
+
+            // Update the progress bar width
+            document.getElementById("progress-bar").style.width = percent + "%";
+
+            // Update the count text
+            document.getElementById("progress-text").textContent = completedDownloads + " / " + imageFolderLength;
+        }
+        
+// Function to fetch event names from DynamoDB
+function fetchEventNames() {
+	// Define the DynamoDB table name
+	const tableName = "events"; // Replace with your DynamoDB table name
+	
+	// Define the attribute name for event name
+	const eventKey = "event-name";
+
+	var params = {
+		TableName: tableName // Replace with your DynamoDB table name
+	};
+
+	dynamodb.scan(params, function(err, data) {
+		if (err) {
+			console.error("Error fetching event names from DynamoDB:", err);
+			return;
+		}
+
+        // Assuming your DynamoDB table has an attribute 'event-name'
+        var eventNames = data.Items.map(function(item) {
+            return item['event-name']; // Adjust based on your DynamoDB schema
+        });
+        
+		// Populate the dropdown menu
+		var eventNameDropdown = document.getElementById("eventName");
+		eventNames.forEach(function(eventName) {
+			var option = document.createElement("option");
+			option.value = eventName;
+			option.text = eventName;
+			eventNameDropdown.appendChild(option);
+		});
+	});
+}
+
+function isValidImageMimeType(mimeType) {
+  const validImageMimeTypes = ['image/jpeg']; // Add more as needed
+  return validImageMimeTypes.includes(mimeType.toLowerCase());
+}
+
+function compareArrays(array1, array2) {
+  if (array1.length !== array2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < array1.length; i++) {
+    if (array1[i] !== array2[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isValidImageHeader(arrayBuffer) {
+  // Define image format headers (add more as needed)
+  const jpegHeader = [0xFF, 0xD8]; // JPEG
+
+
+  const headerBytes = new Uint8Array(arrayBuffer.slice(0, 4)); // Read the first 4 bytes
+
+  // Compare the header bytes to known image format headers
+  if (
+    compareArrays(headerBytes, jpegHeader)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function compareArrays(array1, array2) {
+  if (array1.length !== array2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < array1.length; i++) {
+    if (array1[i] !== array2[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function removeDuplicateImages(imageUrls) {
+  // Use a Set to store unique image URLs
+  const uniqueUrls = new Set(imageUrls);
+
+  // Convert the Set back to an array to maintain the order
+  const uniqueImageUrls = [...uniqueUrls];
+
+  return uniqueImageUrls;
+}
+
+
 function downloadAllImagesForBin(imageUrls, bin) {
+	showSpinner();
+
+
     // Select all image elements within the photosContainer
     const images = document.querySelectorAll('#photosContainer a');
+    
 	console.log("Attempting to doaload all images for the bin " + images.length);
 
-	console.log("Attempting to check if passed param is good " + imageUrls);
+	const uniqueImages = removeDuplicateImages(images);
 
+	console.log("Attempting to doaload all unique images for the bin " + uniqueImages.length);
+
+	
     // Create an array to store the fetch promises
     const fetchPromises = [];
 
@@ -32,7 +158,7 @@ function downloadAllImagesForBin(imageUrls, bin) {
     const zip = new JSZip();
 
     // Iterate through the images and add them to the zip file
-    images.forEach((image, index) => {
+    uniqueImages.forEach((image, index) => {
         const imageUrl = image;
         console.log("Image URL to fetch is - " + imageUrl);
 		// Split the URL by '/' to get the parts
@@ -47,7 +173,8 @@ function downloadAllImagesForBin(imageUrls, bin) {
 	        fetch(imageUrl)
 	            .then(response => response.blob())
 	            .then(blob => {
-	                zip.file(imageName, blob);
+			      console.log("Downloading Image Name:", imageName);
+				  zip.file(imageName, blob);
 	            })
 	        );
     });
@@ -63,6 +190,7 @@ function downloadAllImagesForBin(imageUrls, bin) {
 		        downloadLink.href = URL.createObjectURL(content);
 		        downloadLink.download = bin + '.zip'; // Customize the zip file name if needed
 		        downloadLink.click();
+		        hideSpinner();
     		});
     	})
 	    .catch(error => {
@@ -149,26 +277,6 @@ function fetchAndDisplayFotos(binToSearch) {
 			} else {
 				console.log("No items found with the specified detectedText value.");
 			}
-
-
-			/*const eventRow = document.createElement("tr");
-			const eventNameCell = document.createElement("td");
-				const eventSinglePhotoPriceCell = document.createElement("td");
-				const eventThreePhotoPriceCell = document.createElement("td");
-				const eventPackPhotoPriceCell = document.createElement("td");
-
-				
-				eventNameCell.textContent = eventName;
-				eventSinglePhotoPriceCell.textContent = "$10";
-				eventThreePhotoPriceCell.textContent = "$25";
-				eventPackPhotoPriceCell.textContent = "$45";
-				
-				eventRow.appendChild(eventNameCell);
-				eventRow.appendChild(eventSinglePhotoPriceCell);
-				eventRow.appendChild(eventThreePhotoPriceCell);
-				eventRow.appendChild(eventPackPhotoPriceCell);
-				
-				eventList.appendChild(eventRow);*/
 		}
 	});
 }

@@ -73,6 +73,8 @@ public class DependencyFactory {
     private static String detectedLabel_key = "detectedlabel";
     private static String highConfidemnceLabel_key = "hiconfidenceImageLabel";
     private static String highConfidemnceText_key = "hiconfidenceImageText";
+    private static String detectedTextddbTableName = "recognizedTextEvent";
+    //private static String detectedTextddbTableName_Devo = "devo.recognizedTextEvent";
 
 
     private static String s3Bucket_default = "mediastore.primary";
@@ -80,7 +82,12 @@ public class DependencyFactory {
 
     private static Region region = Region.US_EAST_2;
     
-    private DependencyFactory() {}
+    public static String getDetectedTextddbTableName() {
+		return detectedTextddbTableName;
+	}
+
+
+	private DependencyFactory() {}
 
     /**
      * @return an instance of S3Client

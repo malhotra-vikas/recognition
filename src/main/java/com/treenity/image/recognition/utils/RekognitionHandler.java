@@ -4,8 +4,8 @@ package com.treenity.image.recognition.utils;
 import java.util.Collection;
 import java.util.List;
 
-import com.treenity.image.recognition.*;
-
+import com.treenity.image.recognition.DetectLabels;
+import com.treenity.image.recognition.DetectText;
 
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;

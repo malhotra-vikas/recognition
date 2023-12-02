@@ -15,9 +15,19 @@
     
 	<h2>Search by bin</h2>
 	<form id="binForm">
-		<label for="binName">Enter full bin (including zeros):</label> <input type="text"
-			id="binName" name="binName" required> <input
-			type="submit" value="Search Fotos">
+		<label for="binName">Enter full bin (including zeros):</label> 
+		<input type="text" id="binName" name="binName" required> 
+		<input type="submit" value="Search Fotos">
+		<div id="spinner-container" class="spinner-container">
+        <div class="spinner"></div>
+        </div>
+ 		<!--div id="progress">
+            <div id="progress-bar"></div>
+            <p id="progress-text">0 / 0</p>
+        </div-->
+        <span id="completionNotification" style="color: red;"></span>
+        <span id="elapsedTime" style="color: red;"></span>
+        
 	</form>
 
 	<h2>Fotos for bin</h2>
