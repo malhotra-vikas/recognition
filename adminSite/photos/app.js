@@ -8,6 +8,7 @@ const tableName = "recognizedTextEvent"; // Replace with your DynamoDB table nam
 const binAttribute = "detectedText";
 const fotosAttribute = "imageArtifacts";
 checkedImages = [];
+binImages = [];
 
 // Add an event listener for the "DOMContentLoaded" event
 document.addEventListener("DOMContentLoaded", function() {
@@ -20,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	//document.getElementById('downloadBinImagesButton').addEventListener('click', downloadBinImages);
 	document.getElementById('downloadAllButton').addEventListener('click', downloadAllImagesForBin);
 	document.getElementById('downloadSelectedButton').addEventListener('click', downloadSelectedImages);
-
 });
 
         // Function to show the spinner
@@ -138,18 +138,17 @@ function removeDuplicateImages(imageUrls) {
   return uniqueImageUrls;
 }
 
-
-function downloadAllImagesForBin(bin) {
+function downloadAllImagesForBin() {
 	showSpinner();
 
-	checkedImages = [];
-
     // Select all image elements within the photosContainer
-    const images = document.querySelectorAll('#photosContainer a');
+    //const images = document.querySelectorAll('#photosContainer div div');
+//    const images = binImages;
     
-	console.log("Attempting to doaload all images for the bin " + images.length);
+	console.log("Attempting to doaload all images for the bin " + binImages.length);
 
-	const uniqueImages = removeDuplicateImages(images);
+	//const uniqueImages = removeDuplicateImages(images);
+	const uniqueImages = binImages;
 
 	console.log("Attempting to doaload all unique images for the bin " + uniqueImages.length);
 
@@ -173,7 +172,7 @@ function downloadAllImagesForBin(bin) {
 		console.log("Image Name:", imageName);
 
         fetchPromises.push(
-	        fetch(imageUrl)
+	        fetch(imageUrl, {method: 'GET'})
 	            .then(response => response.blob())
 	            .then(blob => {
 			      console.log("Downloading Image Name:", imageName);
@@ -228,14 +227,18 @@ function downloadSelectedImages() {
 
 		console.log("Image Name:", imageName);
 
-        fetchPromises.push(
-	        fetch(imageUrl)
-	            .then(response => response.blob())
-	            .then(blob => {
-			      console.log("Downloading Image Name:", imageName);
-				  zip.file(imageName, blob);
-	            })
-	        );
+		const fetchPromise = fetch(imageUrl, {method: 'GET'})
+            .then(response => response.blob())
+            .then(blob => {
+                console.log("Downloading Image Name:", imageName);
+                zip.file(imageName, blob);
+            })
+            .catch(error => {
+                console.error("Error fetching image:", error);
+            });
+
+        fetchPromises.push(fetchPromise);
+        
     });
 
     // Wait for all fetch operations to complete
@@ -252,6 +255,7 @@ function downloadSelectedImages() {
     	})
 	    .catch(error => {
 	            console.error("Error fetching images:", error);
+	           	hideSpinner();
 	        });
 
 	}
@@ -294,7 +298,8 @@ function fetchAndDisplayFotos(binToSearch) {
 						// Create a new div for the set of thumbnails and checkboxes
 						const thumbnailDiv = document.createElement("div");
 						thumbnailDiv.className = "thumbnail-container"; // You can define CSS styles for this class
-
+						
+						
 						// Iterate through the individual URLs in the array and create thumbnails with checkboxes
 						imageArtifactsArray.forEach((url) => {
 							// Create a div for each thumbnail and checkbox
@@ -307,6 +312,10 @@ function fetchAndDisplayFotos(binToSearch) {
 							thumbnail.width = 250;
 							thumbnail.height = 250;
 
+							console.log("Showing URL :", url);
+							binImages.push(url);
+					        console.log("Pushed into Bin Images :", url);
+
 							// Create a checkbox
 							const checkbox = document.createElement("input");
 							checkbox.type = "checkbox";
@@ -316,6 +325,8 @@ function fetchAndDisplayFotos(binToSearch) {
 					            if (this.checked) {
 					                // If the checkbox is checked, add the image URL to the array
 					                checkedImages.push(url);
+					                console.log("Pushed into Checked Images :", url);
+
 					            } else {
 					                // If the checkbox is unchecked, remove the image URL from the array
 					                const index = checkedImages.indexOf(url);
@@ -402,6 +413,7 @@ function downloadBinImages(imageUrls) {
 function handleFormSubmission(event) {
 	event.preventDefault();
 	checkedImages = [];
+	binImages = [];
 
 
 	// Get the event name from the input field

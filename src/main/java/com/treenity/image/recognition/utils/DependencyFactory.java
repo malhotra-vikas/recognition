@@ -97,38 +97,9 @@ public class DependencyFactory {
                 .region(Region.US_EAST_2)
                 .httpClientBuilder(UrlConnectionHttpClient.builder())
                 .build();
-/*    	
-        return S3Client.builder()
-                       .credentialsProvider(ProfileCredentialsProvider.create("default"))
-                       .region(Region.US_EAST_2)
-                       .httpClientBuilder(UrlConnectionHttpClient.builder())
-                       .build();
-*/
     }
     
-    public static S3TransferManager createDefaultTm() {
-        // snippet-start:[s3.tm.java2.s3clientfactory.create_default_tm]
-        S3TransferManager transferManager = S3TransferManager.create();
-        // snippet-end:[s3.tm.java2.s3clientfactory.create_default_tm]
-        return transferManager;
-    }
     
-    public static S3TransferManager createCustonTm(){
-        // snippet-start:[s3.tm.java2.s3clientfactory.create_custom_tm]
-        S3AsyncClient s3AsyncClient =
-            S3AsyncClient.crtBuilder()
-            	.region(Region.US_EAST_2)
-                .targetThroughputInGbps(20.0)
-                .minimumPartSizeInBytes(8 * MB)
-                .build();
-
-        S3TransferManager transferManager =
-            S3TransferManager.builder()
-                .s3Client(s3AsyncClient)
-                .build();
-        // snippet-end:[s3.tm.java2.s3clientfactory.create_custom_tm]
-        return transferManager;
-    }
 
     public static DynamoDbClient ddbClient() {
     	return DynamoDbClient.builder()
