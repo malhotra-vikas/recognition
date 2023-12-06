@@ -126,7 +126,7 @@
                                 var params = {
                                     Bucket: 'mediastore.primary.1', // Replace with your S3 bucket name
                                     Key: `${eventName}/${photographerName}/${imageName}`, // S3 object key
-                                    //Key: `${eventName}/${photographerName}/${file}`, // S3 object key
+                                    CacheControl: 'no-cache', // Add no-cache metadata
                                     Body: file // Image file to upload
                                 };
 
